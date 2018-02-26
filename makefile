@@ -1,4 +1,4 @@
-SOURCES = maintemp.c
+SOURCES = maintemp.c i2c_wrapper.c
 
 OBJS = $(SOURCES:.c=.o)
 IMP = $(SOURCES:.c=.i)

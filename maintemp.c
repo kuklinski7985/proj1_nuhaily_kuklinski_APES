@@ -7,17 +7,22 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "i2c_wrapper.h"
 
 
 int tempsensor;          //used for return value for open()
 
 int temp_addr = 0x48;       //slave address for the temp sensor
+char info[2] = {0};    //array for reading and sending data to sensor
 
 int main()
 {
-  int testing =0;           //verify read and write operations
+  //int testing =0;           //verify read and write operations
+  
   char * tempsense_path = "/dev/i2c-2";
-  if((tempsensor = open(tempsense_path, O_RDWR)) < 0)
+  i2c_init(tempsense_path, temp_addr);
+
+  /*if((tempsensor = open(tempsense_path, O_RDWR)) < 0)
     {
       printf("counld not open i2c bus!\n");
       return -1;
@@ -29,15 +34,7 @@ int main()
       return -1;
     }
 
-  /*rw_tempsensor * info;
-  info = (rw_tempsensor*)malloc((sizeof)rw_tempsensor);
-  if(info == NULL)
-    {
-      printf("malloc failed\n");
-      return -1;
-      }*/
-
-  /*if(write(tempsense_path, info,3) != 3)
+  if(write(tempsense_path, info,3) != 3)
     {
       printf("writting data to sensor failed\n");
       return -1;
@@ -47,14 +44,15 @@ int main()
   write(tempsensor,tempbuff, 1);
 
   sleep(1);
-  char info[2] = {0};    //array for reading and sending data to sensor
+
 
   int temp_final = 0;
   float celsius, fahr;
   
   while(1)
     {
-      testing = read(tempsensor, info, 2);
+      i2c_read(tempsensor, info, 2);
+      /*testing = read(tempsensor, info, 2);
       if(testing != 2)
 	{
 	  printf("error reading\n");
@@ -64,7 +62,7 @@ int main()
 	  printf("read failed\n");
 	  return -1;
 	}
-      printf("[0]: %d | [1]: %d\n",info[0],info[1]);
+	printf("[0]: %d | [1]: %d\n",info[0],info[1]);*/
       
       //combine MSB LSB, shift b/c 12 bit resolution
       temp_final = ((info[0] << 8) | info[1]) >> 4;
