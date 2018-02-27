@@ -2,7 +2,7 @@
 * @file i2c_wrapper.h
 * @brief wrapper prototypes for the the i2c read and write commands. includes
 * mutex functionality
-* @author Andrew Kuklinski
+* @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/
 

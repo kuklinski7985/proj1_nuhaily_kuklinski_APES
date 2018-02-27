@@ -56,7 +56,7 @@ int i2c_write(int fd, char * buff, size_t count)
   
   printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
   
-  return testing;
+  return 0;
 
 }
 
