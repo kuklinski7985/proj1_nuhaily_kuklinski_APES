@@ -8,11 +8,12 @@ CFLAGS = -pthread -lrt
 CC = arm-linux-gnueabihf-gcc
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 .PHONY: build
 build: $(OBJS)
-	$(CC) $(DEBUG) $(OBJS) -o $@
+	#$(CC) $(DEBUG) $(OBJS) -o $@
+	$(CC) -O $@ $^ $(DEBUG) 
 
 .PHONY: clean
 clean:

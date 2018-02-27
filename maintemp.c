@@ -10,17 +10,17 @@
 #include "i2c_wrapper.h"
 
 
-int tempsensor;          //used for return value for open()
+int tempsensor;          //used for return value for open(), file indicator
 
 int temp_addr = 0x48;       //slave address for the temp sensor
 char info[2] = {0};    //array for reading and sending data to sensor
 
 int main()
 {
-  //int testing =0;           //verify read and write operations
+  int testing =0;           //verify read and write operations
   
   char * tempsense_path = "/dev/i2c-2";
-  i2c_init(tempsense_path, temp_addr);
+  tempsensor = i2c_init(tempsense_path, temp_addr);
 
   /*if((tempsensor = open(tempsense_path, O_RDWR)) < 0)
     {
@@ -41,7 +41,8 @@ int main()
       }*/
 
   char tempbuff[1] = {0x00};
-  write(tempsensor,tempbuff, 1);
+  //write(tempsensor,tempbuff, 1);
+  i2c_write(tempsensor,tempbuff,1);
 
   sleep(1);
 

@@ -18,12 +18,12 @@
 
 #include "i2c_wrapper.h"
 
-
+extern int tempsensor;
 int i2c_read(int fd, char* buff, size_t count)
 {
   int testing;
   testing = read(fd, buff, count);
-  if(testing != 2)
+  if(testing != count)
     {
       printf("error reading\n");
       return -1;
@@ -39,15 +39,29 @@ int i2c_read(int fd, char* buff, size_t count)
   return 0;
 }
 
-int i2c_write(int fd, void *buf, size_t count)
+int i2c_write(int fd, char * buff, size_t count)
 {
-  return 0;
+  int testing;
+  testing = write(fd, buff, count);
+  if(testing != count)
+    {
+      printf("error writting\n");
+      return -1;
+    }
+  if(testing < 0)
+    {
+      printf("write failed\n");
+      return -1;
+    }
+  
+  printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
+  
+  return testing;
 
 }
 
 int i2c_init(char * filepath, int addr)
 {
-  int tempsensor;
   if((tempsensor = open(filepath, O_RDWR)) < 0)
     {
       printf("counld not open i2c bus!\n");
@@ -60,4 +74,5 @@ int i2c_init(char * filepath, int addr)
       return -1;
     }
 
+  return tempsensor;
 }

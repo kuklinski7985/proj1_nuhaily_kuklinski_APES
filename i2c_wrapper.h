@@ -12,7 +12,7 @@
 
 int i2c_read(int fd, char* buff, size_t count);
 
-int i2c_write(int fd, void *buf, size_t count);
+int i2c_write(int fd, char * buff, size_t count);
 
 int i2c_init(char * filepath, int addr);
 #endif /*__i2c_wrapper_h_*/
