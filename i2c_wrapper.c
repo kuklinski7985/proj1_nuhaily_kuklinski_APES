@@ -34,7 +34,7 @@ int i2c_read(int fd, char* buff, size_t count)
       return -1;
     }
   
-  printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
+  //printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
 
   return 0;
 }
@@ -54,7 +54,7 @@ int i2c_write(int fd, char * buff, size_t count)
       return -1;
     }
   
-  printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
+  //printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
   
   return 0;
 
