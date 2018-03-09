@@ -70,9 +70,10 @@ int i2c_init(char * filepath, int addr)
 
   if(ioctl(tempsensor, I2C_SLAVE, addr) < 0)
     {
-      printf("Fail: bus access / talk to salve\n");
+      printf("Fail: bus access / talk to slave\n");
       return -1;
     }
 
+  printf("i2c init complete\n");
   return tempsensor;
 }

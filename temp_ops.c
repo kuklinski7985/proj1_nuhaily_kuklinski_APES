@@ -21,13 +21,22 @@
 #include "temp_ops.h"
 
 int bizzounce;
+int tempsensor;
+
+int tempsensor;          //used for return value for open(), file indicator
+
+int temp_addr = 0x48;       //slave address for the temp sensor
+char readinfo[2] = {0};    //array for reading and sending data to sensor
+char writeinfo[2] = {0};
+char * tempsense_path = "/dev/i2c-2";
 
 void *temp_ops()
 {
   printf("entering temp_ops\n");
 
   signal(SIGUSR1, temp_ops_exit);    //signal handler for temp_ops function
-  unsigned long long int delay_time = 100000000;  //in nanoseconds
+  tempsensor = i2c_init(tempsense_path, temp_addr);
+  unsigned long long int delay_time = 500000000;  //in nanoseconds
   metric_counter_init(delay_time);
   while(bizzounce == 0);  //keeps the thread alive to process signals and timer requests
   
@@ -42,8 +51,11 @@ void temp_ops_exit(int signum)
 
 void handler_timer(union sigval arg)
 {
-  //this is where to put the temperature requisition code
-  printf("the timer has fired.  BAM!\n");
+  //
+  r_temp_reg(tempsensor,readinfo);
+  //display_c(readinfo);
+  display_f(readinfo);
+  //display_k(readinfo);
 }
 
 void metric_counter_init(unsigned long long int firedelay)    
