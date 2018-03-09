@@ -19,6 +19,7 @@
 #include "i2c_wrapper.h"
 #include "tempsense.h"
 #include "temp_ops.h"
+//#include "myusrled.h"
 
 pthread_t tempops_thread;    //creates new pthread
 pthread_attr_t attr;         //standard attributes for pthread 
@@ -39,7 +40,7 @@ int main()
     }
 
   pthread_join(tempops_thread,NULL);
-
+  
 }
 
   
