@@ -1,9 +1,9 @@
-SOURCES = maintemp.c i2c_wrapper.c tempsense.c
+SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c
 OBJS = $(SOURCES:.c=.o)
 IMP = $(SOURCES:.c=.i)
 INCLUDES = 
 CC = arm-linux-gnueabihf-gcc
-DEBUG = -g -Wall -Werror -O0
+DEBUG = -pthread -lrt #-g -Wall -Werror -O0 
 CPPFLAGS = 
 LDFLAGS = -lm -Wl,-Map,project1.map
 CFLAGS = -c
@@ -27,7 +27,7 @@ compile-all: $(OBJS)
 
 .PHONY: build
 build: $(OBJS)
-	$(CC) $(DEBUG) $(OBJS) $(PLATFORM_FLAGS) $(LDFLAGS) -o project1.elf
+	$(CC) $(DEBUG) $(OBJS) $(LDFLAGS) -o project1.elf -lrt
 	size project1.elf $(OBJS)
 
 
