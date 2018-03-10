@@ -11,3 +11,13 @@ temp_ops.c/.h : functions that are associated with the threads that are created 
                 could also be used for required heartbeat of sensors
                 
 tempsense.c/.h : contain functions to interact with the TMP102 temperature sensor.  The sensor is connected to the I2C-2 bus, 
+
+
+
+BBG Pinout:
+
+Pin #	Pin Name	Connection
+1	DGND		TMP102 DGND
+3	VDD_3V3		TMP102 VDD
+19	I2C2_SCL	TMP102 SCL
+20	I2C2_SDA	TMP102 SDA
