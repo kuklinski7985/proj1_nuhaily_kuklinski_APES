@@ -8,17 +8,19 @@
 
 #include "i2c_wrapper.h"
 
-extern int tempsensor;
+extern int i2ctarget;
+
 int i2c_read(int fd, char* buff, size_t count)
 {
-  int testing;
-  testing = read(fd, buff, count);
-  if(testing != count)
+  int ret;
+  ret = read(fd, buff, count);
+  if(ret != count)
     {
-      printf("error reading\n");
+      printf("I2C read error. Requested bytes = %d, returned = %d\n", count, \
+        ret);
       return -1;
     }
-  if(testing < 0)
+  if(ret < 0)
     {
       printf("read failed\n");
       return -1;
@@ -31,14 +33,15 @@ int i2c_read(int fd, char* buff, size_t count)
 
 int i2c_write(int fd, char * buff, size_t count)
 {
-  int testing;
-  testing = write(fd, buff, count);
-  if(testing != count)
+  int ret;
+  ret = write(fd, buff, count);
+  if(ret != count)
     {
-      printf("error writting\n");
+      printf("I2C write error. Requested bytes = %d, returned = %d\n", count, \
+        ret);
       return -1;
     }
-  if(testing < 0)
+  if(ret < 0)
     {
       printf("write failed\n");
       return -1;
@@ -52,18 +55,18 @@ int i2c_write(int fd, char * buff, size_t count)
 
 int i2c_init(char * filepath, int addr)
 {
-  if((tempsensor = open(filepath, O_RDWR)) < 0)
+  if((i2ctarget = open(filepath, O_RDWR)) < 0)
     {
-      printf("counld not open i2c bus!\n");
+      printf("Could not open I2C bus!\n");
       return -1;
     }
 
-  if(ioctl(tempsensor, I2C_SLAVE, addr) < 0)
+  if(ioctl(i2ctarget, I2C_SLAVE, addr) < 0)
     {
       printf("Fail: bus access / talk to slave\n");
       return -1;
     }
 
-  printf("i2c init complete\n");
-  return tempsensor;
+  printf("I2C init complete.\n");
+  return i2ctarget;
 }
