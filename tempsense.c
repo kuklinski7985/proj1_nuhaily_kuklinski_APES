@@ -5,19 +5,7 @@
 * @date 03/11/2018
 **/
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include "tempsense.h"
-#include "i2c_wrapper.h"
-
 
 void w_ptr_reg(int fd, ptr_reg ptrreg)
 {
@@ -29,7 +17,7 @@ void r_tlow_reg(int fd, char * buff)
 {
   char reg_pick[1] = {TLOW_REG};
   i2c_write(fd,reg_pick,1);
-  
+
   i2c_read(fd, buff,2);
 
 }
@@ -46,7 +34,7 @@ void r_thigh_reg(int fd, char * buff)
 {
   char reg_pick[1] = {THIGH_REG};
   i2c_write(fd,reg_pick,1);
-  
+
   i2c_read(fd, buff,2);
 
 }
@@ -71,11 +59,11 @@ void w_config_reg(int fd, char * buff)
 {
   char reg_pick[1] = {CONFIG_REG};
   i2c_write(fd, reg_pick, 1);
-  
+
   char config_reg_val[1] = {0};
   i2c_read(fd,config_reg_val,1);
   printf("config_reg: %x\n",config_reg_val[0]);
-  
+
   config_reg_val[0] |= buff[0];
   printf("config_reg: %x\n",config_reg_val[0]);
 
@@ -92,10 +80,10 @@ void w_config_reg(int fd, char * buff)
       printf("value must be between 0 and 3\n");
       exit(1);
     }
-  
+
   char reg_pick[1] = {CONFIG_REG};
   i2c_write(fd, reg_pick, 1);
-  
+
   char config_reg_val[1] = {0};
   i2c_read(fd,config_reg_val,1);
   printf("config_reg: %x\n",config_reg_val[0]);
@@ -127,7 +115,7 @@ void w_config_reg(int fd, char * buff)
   i2c_write(fd,config_reg_val,1);
 
   return config_reg_val[0];
-  
+
   }*/
 
 
@@ -140,7 +128,7 @@ int r_config_reg(int fd)
   i2c_read(fd,config_reg_val,1);
 
   printf("current configuration value: %x\n",config_reg_val[0]);
-  
+
   return config_reg_val[0];
 }
 
@@ -173,4 +161,3 @@ float display_k(char * buff)
   printf("degree-K: %04f\n",kelvin);
   return kelvin;
 }
-

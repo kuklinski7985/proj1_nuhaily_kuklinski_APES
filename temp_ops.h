@@ -9,6 +9,20 @@
 #ifndef temp_ops_h_
 #define temp_ops_h_
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pthread.h>
+#include <signal.h>
+#include <sys/time.h>
+#include "i2c_wrapper.h"
+#include "tempsense.h"
+
 void *temp_ops();
 
 void temp_ops_exit(int signum);

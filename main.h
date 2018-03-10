@@ -16,6 +16,10 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/time.h>
+#include "i2c_wrapper.h"
+#include "tempsense.h"
+#include "temp_ops.h"
+//#include "myusrled.h"
 
 typedef struct input_struct{
   int member1;

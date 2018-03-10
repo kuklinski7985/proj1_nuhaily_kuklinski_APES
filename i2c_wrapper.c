@@ -6,16 +6,6 @@
 * @date 03/11/2018
 **/
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include "i2c_wrapper.h"
 
 extern int tempsensor;
@@ -33,7 +23,7 @@ int i2c_read(int fd, char* buff, size_t count)
       printf("read failed\n");
       return -1;
     }
-  
+
   //printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
 
   return 0;
@@ -53,9 +43,9 @@ int i2c_write(int fd, char * buff, size_t count)
       printf("write failed\n");
       return -1;
     }
-  
+
   //printf("[0]: %d | [1]: %d\n",buff[0],buff[1]);
-  
+
   return 0;
 
 }

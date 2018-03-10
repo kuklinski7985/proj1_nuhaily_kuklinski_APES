@@ -9,6 +9,18 @@
 #ifndef tempsense_h_
 #define tempsense_h_
 
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include "i2c_wrapper.h"
+
 #define PTRREG_SD_MASK      0x01
 #define PTRREG_TM_MASK      0x02
 #define PTRREG_POL_MASK     0X04

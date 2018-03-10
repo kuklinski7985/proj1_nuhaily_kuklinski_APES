@@ -10,6 +10,17 @@
 #ifndef i2c_wrapper_h_
 #define i2c_wrapper_h_
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/i2c-dev.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+
 int i2c_read(int fd, char* buff, size_t count);
 
 int i2c_write(int fd, char * buff, size_t count);

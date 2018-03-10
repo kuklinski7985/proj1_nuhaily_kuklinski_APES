@@ -5,19 +5,6 @@
 * @date 03/11/2018
 **/
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/i2c-dev.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pthread.h>
-#include <signal.h>
-#include <sys/time.h>
-#include "i2c_wrapper.h"
-#include "tempsense.h"
 #include "temp_ops.h"
 
 int bizzounce;
@@ -39,7 +26,7 @@ void *temp_ops()
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   metric_counter_init(delay_time);
   while(bizzounce == 0);  //keeps the thread alive to process signals and timer requests
-  
+
   return 0;
 }
 
@@ -58,15 +45,15 @@ void handler_timer(union sigval arg)
   //display_k(readinfo);
 }
 
-void metric_counter_init(unsigned long long int firedelay)    
+void metric_counter_init(unsigned long long int firedelay)
 {
   timer_t timer;
   //sets values for timer interval and initial expiration
   struct itimerspec timer_interval;
 
   //descibe the way a process is to be notified about and event
-  struct sigevent timer_actions;       
-  
+  struct sigevent timer_actions;
+
   timer_actions.sigev_notify = SIGEV_THREAD;
   timer_actions.sigev_value.sival_ptr = &timer;
   timer_actions.sigev_notify_function = handler_timer;
