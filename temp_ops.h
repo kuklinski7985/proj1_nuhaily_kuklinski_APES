@@ -9,10 +9,6 @@
 #ifndef temp_ops_h_
 #define temp_ops_h_
 
-typedef struct input_struct{
-  int member1;
-}input_struct;
-
 void *temp_ops();
 
 void temp_ops_exit(int signum);
