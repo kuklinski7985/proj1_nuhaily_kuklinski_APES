@@ -8,7 +8,7 @@
 
 #include "i2c_wrapper.h"
 
-extern int i2ctarget;
+//extern int i2ctarget;
 
 int i2c_read(int fd, char* buff, size_t count)
 {
@@ -16,8 +16,8 @@ int i2c_read(int fd, char* buff, size_t count)
   ret = read(fd, buff, count);
   if(ret != count)
     {
-      printf("I2C read error. Requested bytes = %d, returned = %d\n", count, \
-        ret);
+      printf("I2C read error. Requested bytes = %d, returned = %d\
+\n", count, ret);
       return -1;
     }
   if(ret < 0)
@@ -37,8 +37,8 @@ int i2c_write(int fd, char * buff, size_t count)
   ret = write(fd, buff, count);
   if(ret != count)
     {
-      printf("I2C write error. Requested bytes = %d, returned = %d\n", count, \
-        ret);
+      printf("I2C write error. Requested bytes = %d, returned = \
+%d\n", count, ret);
       return -1;
     }
   if(ret < 0)
@@ -55,6 +55,8 @@ int i2c_write(int fd, char * buff, size_t count)
 
 int i2c_init(char * filepath, int addr)
 {
+  int i2ctarget;
+
   if((i2ctarget = open(filepath, O_RDWR)) < 0)
     {
       printf("Could not open I2C bus!\n");

@@ -8,6 +8,7 @@
 #include "main.h"
 
 pthread_t tempops_thread;    //creates new pthread
+pthread_t lightops_thread;    //creates new pthread
 pthread_attr_t attr;         //standard attributes for pthread
 
 int main()
@@ -25,6 +26,13 @@ int main()
       return -1;
     }
 
-  pthread_join(tempops_thread,NULL);
+  checking = pthread_create(&lightops_thread, &attr, light_ops, (void*)input1);
+  if(checking)
+  {
+    fprintf(stderr, "Error Creating light_ops thread");
+    return -1;
+  }
 
+  pthread_join(tempops_thread, NULL);
+  pthread_join(lightops_thread, NULL);
 }

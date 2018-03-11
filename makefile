@@ -1,10 +1,10 @@
-SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c #myusrled.c
+SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c #myusrled.c
 OBJS = $(SOURCES:.c=.o)
 IMP = $(SOURCES:.c=.i)
-INCLUDES = 
+INCLUDES =
 CC = arm-linux-gnueabihf-gcc
-DEBUG = -pthread -lrt #-g -Wall -Werror -O0 
-CPPFLAGS = 
+DEBUG = -pthread -lrt #-g -Wall -Werror -O0
+CPPFLAGS =
 LDFLAGS = -lm -Wl,-Map,project1.map
 CFLAGS = -c
 LFLAGS = -S
