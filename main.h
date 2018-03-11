@@ -20,8 +20,13 @@
 #include "tempsense.h"
 #include "temp_ops.h"
 #include "light_ops.h"
+#include "remote_socket.h"
 //#include "myusrled.h"
 
 typedef struct input_struct{
   int member1;
 } input_struct;
+
+
+
+
