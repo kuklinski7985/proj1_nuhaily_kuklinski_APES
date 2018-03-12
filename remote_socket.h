@@ -5,6 +5,15 @@
 * @date 03/11/2018
 **/
 
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+
+#define PORT 8080
 
 #ifndef remote_socket_h_
 #define remote_socket_h_

@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
   //struct sockaddr_in addr;
   struct sockaddr_in sock_addr;    //struct that contains the port and Ip addr
   int sock_handle;                 //assigned socket tracking value
-  char rec_mess[32] = {0};         //storing received message
+  char rec_mess[64] = {0};         //storing received message
 
   char * test_message = "CLIENT: Be like water.";
 
@@ -28,11 +28,11 @@ int main(int argc, char const *argv[])
       return -1;
     }
 
-  //sock_addr = (sockaddr_in *)malloc(sizeof(sockaddr_in));
   sock_addr.sin_family = AF_INET;
   sock_addr.sin_port = htons(PORT);
 
   if(inet_pton(AF_INET, "127.0.0.1", &sock_addr.sin_addr)<=0)
+  //if(inet_pton(AF_INET, "192.168.7.2", &sock_addr.sin_addr)<=0)
     {
       printf("Invalid address\n");
       return -1;
@@ -45,7 +45,8 @@ int main(int argc, char const *argv[])
     }
   send(sock_handle, test_message, strlen(test_message),0);
   printf("Client message sent\n");
-  int valread = read(sock_handle, rec_mess, 1024);
+  int valread = read(sock_handle, rec_mess, 64);
+  //recv(sock_handle, rec_mess, 1, MSG_WAITFORONE);
   printf("%s\n", rec_mess);
 
   return 0;
