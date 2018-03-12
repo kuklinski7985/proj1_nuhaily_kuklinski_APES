@@ -20,6 +20,7 @@
 #include "tempsense.h"
 #include "temp_ops.h"
 #include "light_ops.h"
+#include "logger/logger.h"
 //#include "myusrled.h"
 
 typedef struct input_struct{

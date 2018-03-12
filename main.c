@@ -9,7 +9,11 @@
 
 pthread_t tempops_thread;    //creates new pthread
 pthread_t lightops_thread;    //creates new pthread
+pthread_t log_thread;
+
 pthread_attr_t attr;         //standard attributes for pthread
+
+int bizzounce;
 
 int main()
 {
@@ -19,6 +23,9 @@ int main()
   input1 = (input_struct*)malloc(sizeof(input_struct));
   input1->member1 = 1234;
   pthread_attr_init(&attr);
+
+  checking = pthread_create(&log_thread, &attr, logger, (void*)input1);
+
   checking = pthread_create(&tempops_thread, &attr, temp_ops,(void*)input1);
   if(checking)
     {
@@ -35,4 +42,6 @@ int main()
 
   pthread_join(tempops_thread, NULL);
   pthread_join(lightops_thread, NULL);
+  pthread_join(log_thread, NULL);
+
 }

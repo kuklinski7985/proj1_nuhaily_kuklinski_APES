@@ -1,4 +1,4 @@
-SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c #myusrled.c
+SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c #myusrled.c
 OBJS = $(SOURCES:.c=.o)
 IMP = $(SOURCES:.c=.i)
 INCLUDES =
@@ -34,3 +34,4 @@ build: $(OBJS)
 .PHONY: clean
 clean:
 	-rm *.i *.o *.map *.d project1.elf a.out
+	-rm logger/*.o logger/*.d project1.elf a.out

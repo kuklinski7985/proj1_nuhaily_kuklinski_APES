@@ -7,7 +7,7 @@
 
 #include "temp_ops.h"
 
-int bizzounce;
+extern int bizzounce;
 int tempsensor;
 
 int tempsensor;          //used for return value for open(), file indicator
