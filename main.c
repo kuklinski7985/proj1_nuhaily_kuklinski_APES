@@ -20,8 +20,8 @@ int main()
   int checking;                    //check value for pthread creation
   input_struct * input1;           //input for pthread,couldnt get to work w/o
 
-  remote_socket_init();
-  input1 = (input_struct*)malloc(sizeof(input_struct));
+  remote_socket_server_init();
+  /*input1 = (input_struct*)malloc(sizeof(input_struct));
   input1->member1 = 1234;
   pthread_attr_init(&attr);
 
@@ -44,6 +44,6 @@ int main()
 
   pthread_join(tempops_thread, NULL);
   pthread_join(lightops_thread, NULL);
-  pthread_join(log_thread, NULL);
+  pthread_join(log_thread, NULL);*/
 
 }

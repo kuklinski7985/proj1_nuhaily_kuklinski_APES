@@ -25,7 +25,7 @@
 #include "tempsense.h"
 #include "temp_ops.h"
 #include "light_ops.h"
-#include "remote_socket.h"
+#include "remote_socket_server.h"
 #include "logger/logger.h"
 //#include "myusrled.h"
 
