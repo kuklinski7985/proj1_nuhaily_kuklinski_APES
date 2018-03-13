@@ -13,7 +13,7 @@
 #include <netinet/in.h>
 #include <string.h>
 
-#define PORT 8080
+
 
 #ifndef remote_socket_h_
 #define remote_socket_h_

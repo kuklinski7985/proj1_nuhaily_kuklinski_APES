@@ -19,7 +19,8 @@ int main(int argc, char const *argv[])
   int sock_handle;                 //assigned socket tracking value
   char rec_mess[64] = {0};         //storing received message
 
-  char * test_message = "CLIENT: Be like water.";
+  //char * rec_mess;
+  char * test_message = "Be like water.";
 
   sock_handle = socket(AF_INET, SOCK_STREAM, 0);
   if(sock_handle < 0)
@@ -27,12 +28,12 @@ int main(int argc, char const *argv[])
       printf("Socket not created\n");
       return -1;
     }
+  //memset(&sock_addr, '0', sizeof(sock_addr));
 
   sock_addr.sin_family = AF_INET;
   sock_addr.sin_port = htons(PORT);
 
   if(inet_pton(AF_INET, "127.0.0.1", &sock_addr.sin_addr)<=0)
-  //if(inet_pton(AF_INET, "192.168.7.2", &sock_addr.sin_addr)<=0)
     {
       printf("Invalid address\n");
       return -1;
@@ -46,7 +47,6 @@ int main(int argc, char const *argv[])
   send(sock_handle, test_message, strlen(test_message),0);
   printf("Client message sent\n");
   int valread = read(sock_handle, rec_mess, 64);
-  //recv(sock_handle, rec_mess, 1, MSG_WAITFORONE);
   printf("%s\n", rec_mess);
 
   return 0;

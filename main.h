@@ -16,6 +16,11 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/time.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+
 #include "i2c_wrapper.h"
 #include "tempsense.h"
 #include "temp_ops.h"
