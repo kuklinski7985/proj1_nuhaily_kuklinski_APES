@@ -28,6 +28,8 @@
 #define PTRREG_R1R0_MASK(X) (x<<6)
 #define PTRREG_OS_MASK      0x80
 
+#define CONTROL_BYTE        ((char)0x03)
+
 typedef enum{
   CONTROL,
   TIMING,

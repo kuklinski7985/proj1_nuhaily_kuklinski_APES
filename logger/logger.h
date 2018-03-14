@@ -29,11 +29,12 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <mqueue.h>
+#include <errno.h>
 #include "sync_fileio.h"
 
 #define LOG_MAX_ELEMENTS  64
 #define LOG_ELEMENT_SIZE  128
-#define LOG_LINE_SIZE     256
+#define LOG_LINE_SIZE     255
 
 typedef enum
 {
@@ -54,7 +55,7 @@ typedef struct
 } log_struct_t;
 
 void* logger();
-void queueHasData();
+static void queueHasData();
 void log_exit();
 void writeLogStr(file_t* logfile, log_struct_t logitem);
 char* getCurrentTimeStr();

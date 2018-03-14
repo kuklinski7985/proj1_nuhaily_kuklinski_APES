@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <mqueue.h>
 #include "i2c_wrapper.h"
 #include "tempsense.h"
 #include "temp_ops.h"
