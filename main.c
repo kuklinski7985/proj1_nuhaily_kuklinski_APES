@@ -17,6 +17,8 @@ int bizzounce;
 
 int main()
 {
+
+  
   int checking;                    //check value for pthread creation
   input_struct * input1;           //input for pthread,couldnt get to work w/o
 
