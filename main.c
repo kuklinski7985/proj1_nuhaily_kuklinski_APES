@@ -23,11 +23,16 @@ int main()
   int checking;                    //check value for pthread creation
   input_struct * input1;           //input for pthread,couldnt get to work w/o
 
+<<<<<<< HEAD
   //char* test_entry = "7\n";
   char buf1[255];
 
 
   input1 = (input_struct*)malloc(sizeof(input_struct));
+=======
+  remote_socket_server_init();
+  /*input1 = (input_struct*)malloc(sizeof(input_struct));
+>>>>>>> 65097e989f6f9cd35eaa654ca9af84b22748f350
   input1->member1 = 1234;
   pthread_attr_init(&attr);
 
@@ -45,7 +50,8 @@ int main()
   {
     fprintf(stderr, "Error Creating light_ops thread");
     return -1;
-  }
+    }
+
 
   if(log_queue != -1)
   {
@@ -60,8 +66,12 @@ int main()
 
   pthread_join(tempops_thread, NULL);
   pthread_join(lightops_thread, NULL);
+<<<<<<< HEAD
   pthread_join(log_thread, NULL);
   mq_close(log_queue);
   printf("mq_close err: %s\n", strerror(errno));
+=======
+  pthread_join(log_thread, NULL);*/
+>>>>>>> 65097e989f6f9cd35eaa654ca9af84b22748f350
 
 }
