@@ -54,6 +54,9 @@ typedef struct
 
 } log_struct_t;
 
+
+
+
 void* logger();
 static void queueHasData();
 void log_exit();
