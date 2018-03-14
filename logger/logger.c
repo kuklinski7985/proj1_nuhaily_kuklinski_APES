@@ -7,34 +7,44 @@ pthread_mutex_t sprintf_mutex;
 
 
 extern int bizzounce;
-int log_queue;
-file_t logfile;
+extern mqd_t log_queue;
+extern file_t logfile;
+
+//TODO set up shared memory to indicate when logger queue is initialized so that other
+// threads don't try to write to it before it's ready
 
 void* logger()
 {
   // initialize log queue
-
   struct mq_attr log_attr;
+  struct sigevent qnotify;
 
-
+  printf("***Entering log queue***\n***************\n");
   // Temporary manual set of logfile name
   strcpy(logfile.filename, "prj.log");
 
   fileCreate(&logfile);
-
-  log_attr.mq_maxmsg = 256;
+  log_attr.mq_maxmsg = 255;
   log_attr.mq_msgsize = sizeof(char)*LOG_MAX_ELEMENTS;
   log_attr.mq_flags = 0;
+  printf("Start of program: log queue uninitialized: %d.\n", log_queue);
 
 
-  log_queue = mq_open("Log queue", O_CREAT | O_RDWR, 0664, &log_attr);
+  log_queue = mq_open("/log", O_CREAT | O_RDWR, 0666, &log_attr);
 
-  struct sigevent qnotify;
+  printf("logger thread: log queue initialized: %d.\n", log_queue);
+  printf("logger error: %s\n", strerror(errno));
+
   qnotify.sigev_notify = SIGEV_THREAD;
   qnotify.sigev_notify_function = queueHasData;
   qnotify.sigev_notify_attributes = NULL;
   qnotify.sigev_value.sival_ptr = NULL;
   mq_notify(log_queue, &qnotify);
+
+    printf("mq_notify error: %s\n", strerror(errno));
+  printf("Trying to push to queue from logger thread...\n");
+  mq_send(log_queue, "9\0", 2, 0);
+  printf("mq_send: %s\n", strerror(errno));
 
   signal(SIGUSR1, log_exit);    //signal handler for temp_ops function
 
@@ -49,7 +59,7 @@ void* logger()
   fileClose(&logfile);
 }
 
-void queueHasData()
+static void queueHasData()
 {
   char queue_buf[LOG_ELEMENT_SIZE];
   unsigned int prio;
@@ -57,7 +67,9 @@ void queueHasData()
   // open file
   // read from queue
   mq_receive(log_queue, queue_buf, LOG_ELEMENT_SIZE, &prio);
-
+  printf("**queue received data**\n");
+  strcpy(queue_buf, queue_buf); // will this get rid of extra chars?
+  printf("Data received: %s\n", queue_buf);
   // add to file
   fileWrite(&logfile, queue_buf);
 
@@ -77,7 +89,7 @@ void writeLogStr(file_t* logfile, log_struct_t logitem)
   char ascii_buf[64];
 
   pthread_mutex_lock(&log_mutex);
-
+  printf("Writing element to log.\n");
   switch(logitem.msg_type) // needs timestamps
   {
     case ERROR:

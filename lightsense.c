@@ -23,22 +23,27 @@ void light_r_id_reg(int fd, char* buf)
 
 int light_r_adc0(int fd)
 {
+  char ctrl[1] = {CONTROL_BYTE | CONTROL};
   char cmd1[1] = {DATA0_H};
   char cmd2[1] = {DATA0_L};
   char i2c_readbuf[2];
 
   int val = 0;
-
+  i2c_write(fd, ctrl, 1);
+  //i2c_write(fd, {CONTROL_BYTE}, 1);
+  i2c_read(fd, i2c_readbuf, 2);
   i2c_write(fd, cmd2, 1);
   i2c_read(fd, i2c_readbuf, 2);
   printf("Buffer contents: ");
   printf("%x", i2c_readbuf[0]);
-  printf("%x", i2c_readbuf[1]);
+  printf("%x\n", i2c_readbuf[1]);
   val |= ((int)i2c_readbuf[1] << 3 | (int)i2c_readbuf[0] << 2);
   i2c_write(fd, cmd1, 1);
   i2c_read(fd, i2c_readbuf, 2);
+  printf("Buffer 2 contents: ");
   printf("%x", i2c_readbuf[0]);
   printf("%x", i2c_readbuf[1]);
+  printf(" %s\n", i2c_readbuf);
 /*
   i2c_write(fd, cmd2, 1);
   i2c_read(fd, i2c_readbuf, 2);

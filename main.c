@@ -12,8 +12,11 @@ pthread_t lightops_thread;    //creates new pthread
 pthread_t log_thread;
 
 pthread_attr_t attr;         //standard attributes for pthread
+file_t logfile;
 
 int bizzounce;
+mqd_t log_queue;
+mqd_t ipc_queue;
 
 int main()
 {
@@ -21,6 +24,12 @@ int main()
   
   int checking;                    //check value for pthread creation
   input_struct * input1;           //input for pthread,couldnt get to work w/o
+
+  //char* test_entry = "7\n";
+  char buf1[255];
+
+
+  input1 = (input_struct*)malloc(sizeof(input_struct));
 
   remote_socket_server_init();
   /*input1 = (input_struct*)malloc(sizeof(input_struct));
@@ -44,8 +53,24 @@ int main()
     }
 
 
+  if(log_queue != -1)
+  {
+    printf("Trying to push to queue...\n");
+    mq_send(log_queue, "7", 1, 0);
+    printf("mq_send: %s\n", strerror(errno));
+  }
+
+  else
+    printf("log_queue == -1\n");
+
+
   pthread_join(tempops_thread, NULL);
   pthread_join(lightops_thread, NULL);
+
+  pthread_join(log_thread, NULL);
+  mq_close(log_queue);
+  printf("mq_close err: %s\n", strerror(errno));
+
   pthread_join(log_thread, NULL);*/
 
 }

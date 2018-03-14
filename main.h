@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <mqueue.h>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
