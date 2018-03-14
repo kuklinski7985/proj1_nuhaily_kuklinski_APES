@@ -25,10 +25,6 @@ int main()
   int checking;                    //check value for pthread creation
   input_struct * input1;           //input for pthread,couldnt get to work w/o
 
-<<<<<<< HEAD
-
-=======
->>>>>>> refs/remotes/origin/master
   //char* test_entry = "7\n";
   char buf1[255];
 
@@ -36,7 +32,7 @@ int main()
   input1 = (input_struct*)malloc(sizeof(input_struct));
 
   remote_socket_server_init();
-  /*input1 = (input_struct*)malloc(sizeof(input_struct));
+  input1 = (input_struct*)malloc(sizeof(input_struct));
   input1->member1 = 1234;
   pthread_attr_init(&attr);
 
@@ -70,17 +66,16 @@ int main()
 
   pthread_join(tempops_thread, NULL);
   pthread_join(lightops_thread, NULL);
-<<<<<<< HEAD
-  pthread_join(log_thread, NULL);
-  mq_close(log_queue);
-  printf("mq_close err: %s\n", strerror(errno));
-=======
 
   pthread_join(log_thread, NULL);
   mq_close(log_queue);
   printf("mq_close err: %s\n", strerror(errno));
 
->>>>>>> refs/remotes/origin/master
-  pthread_join(log_thread, NULL);*/
+
+  pthread_join(log_thread, NULL);
+  mq_close(log_queue);
+  printf("mq_close err: %s\n", strerror(errno));
+
+  pthread_join(log_thread, NULL);
 
 }
