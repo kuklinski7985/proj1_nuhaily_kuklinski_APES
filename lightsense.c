@@ -9,45 +9,71 @@
 
 void light_r_id_reg(int fd, char* buf)
 {
-  char id_reg[1] = {ID};
+  char id_reg[1];
+  char readbuf[1];
+  id_reg[0] = CMD | ID;
 
   i2c_write(fd, id_reg, 1);
-  i2c_read(fd, buf, 2);
-  printf("Buffer contents: ");
+  i2c_read(fd, readbuf, 1);
 
-  printf("%x", buf[0]);
-  printf("%x", buf[1]);
-  printf("\n");
-
+  strcpy(buf, readbuf);
 }
 
-int light_r_adc0(int fd)
+void light_w_pwr(int fd, int state)
 {
-  char ctrl[1] = {CONTROL_BYTE | CONTROL};
-  char cmd1[1] = {DATA0_H};
-  char cmd2[1] = {DATA0_L};
-  char i2c_readbuf[2];
+  char ctrl[2];
+  ctrl[0] = CMD | CONTROL;
 
-  int val = 0;
-  i2c_write(fd, ctrl, 1);
-  //i2c_write(fd, {CONTROL_BYTE}, 1);
-  i2c_read(fd, i2c_readbuf, 2);
-  printf("Buffer contents: ");
-  printf("%x", i2c_readbuf[0]);
-  printf("%x\n", i2c_readbuf[1]);
-  i2c_write(fd, cmd1, 1);
-  i2c_read(fd, i2c_readbuf, 2);
-  printf("Data0_H contents: ");
-  printf("%x", i2c_readbuf[0]);
-  printf("%x", i2c_readbuf[1]);
-  printf(" %s\n", i2c_readbuf);
-  i2c_write(fd, cmd2, 1);
-  i2c_read(fd, i2c_readbuf, 2);
-  printf("Data0_L contents: ");
-  printf("%x", i2c_readbuf[0]);
-  printf("%x", i2c_readbuf[1]);
-  printf(" %s\n", i2c_readbuf);
+  if(state == 1)
+  {
+    ctrl[1] = POWER_ON;
+  }
+  else
+  {
+    ctrl[1] = POWER_OFF;
+  }
 
-  return val;
+  i2c_write(fd, ctrl, 2);
+}
+
+void light_r_pwr(int fd, char* readbuf) // must be run immediately after write to power reg for it to work
+{
+  char ctrl[1];
+  i2c_read(fd, readbuf, 1);
+}
+
+int light_r_adc(int fd, int adc_sel, char* readbuf)
+{
+  char ctrl1[1];
+  char ctrl2[1];
+  char temp[1];
+  ctrl1[0] = CMD;
+  ctrl2[0] = CMD;
+
+  if(adc_sel == 0)
+  {
+    ctrl1[0] |= DATA0_L;
+    ctrl2[0] |= DATA0_H;
+  }
+  else
+  {
+    ctrl1[0] |= DATA1_L;
+    ctrl2[0] |= DATA1_H;
+  }
+
+  i2c_write(fd, ctrl1, 1);
+  i2c_read(fd, temp, 1);
+  printf("\nADC sel %d:\n", adc_sel);
+  printf("DataL read: %x\n", temp[0]);
+  readbuf[0] = temp[0];
+  i2c_write(fd, ctrl2, 1);
+  i2c_read(fd, temp, 1);
+  printf("DataH read: %x\n", temp[0]);
+  readbuf[1] = temp[0];
+
+//  i2c_read(fd, readbuf2, 2);
+//  strcat(readbuf, readbuf2);
+
+  return 0;
 
 }

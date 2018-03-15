@@ -28,7 +28,9 @@
 #define PTRREG_R1R0_MASK(X) (x<<6)
 #define PTRREG_OS_MASK      0x80
 
-#define CONTROL_BYTE        ((char)0x03)
+#define POWER_ON        0x03
+#define POWER_OFF       0x00
+#define CMD             0x80
 
 typedef enum{
   CONTROL,
@@ -50,7 +52,10 @@ typedef enum{
 } lightsensor_reg;
 
 void light_r_id_reg(int fd, char* buf);
-int light_r_adc0(int fd);
+void light_w_pwr(int fd, int state);
+void light_r_pwr(int fd, char* readbuf);
+
+int light_r_adc(int fd, int adc_sel, char* readbuf);
 
 
 #endif /*__lightsense_h_*/
