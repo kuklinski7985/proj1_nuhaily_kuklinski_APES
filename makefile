@@ -1,4 +1,4 @@
-SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c remote_socket_server.c #myusrled.c
+SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c remote_socket_server.c ipc_messq.c #myusrled.c
 OBJS = $(SOURCES:.c=.o)
 IMP = $(SOURCES:.c=.i)
 INCLUDES =

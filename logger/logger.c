@@ -8,6 +8,8 @@ pthread_mutex_t sprintf_mutex;
 
 extern int bizzounce;
 extern mqd_t log_queue;
+
+
 extern file_t logfile;
 
 //TODO set up shared memory to indicate when logger queue is initialized so that other
@@ -68,7 +70,7 @@ static void queueHasData()
   // read from queue
   mq_receive(log_queue, queue_buf, LOG_ELEMENT_SIZE, &prio);
   printf("**queue received data**\n");
-  strcpy(queue_buf, queue_buf); // will this get rid of extra chars?
+
   printf("Data received: %s\n", queue_buf);
   // add to file
   fileWrite(&logfile, queue_buf);
