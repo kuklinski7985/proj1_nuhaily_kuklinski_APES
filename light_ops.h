@@ -20,6 +20,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <math.h>
 #include "i2c_wrapper.h"
 #include "lightsense.h"
 
@@ -29,7 +30,8 @@ void light_ops_exit(int signum);
 
 void light_counter_init(unsigned long long int firedelay);
 
+void light_power_test();
 
-
+float counts_to_lux(int ch0, int ch1);
 
 #endif /*__light_ops_h_*/

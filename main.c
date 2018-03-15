@@ -40,7 +40,6 @@ int main()
 
   remote_socket_server_init();
 
-  
   input1 = (input_struct*)malloc(sizeof(input_struct));
   input1->member1 = 1234;
   pthread_attr_init(&attr);
@@ -100,6 +99,11 @@ int main()
   mq_close(log_queue);
   printf("mq_close err: %s\n", strerror(errno));
 
-  pthread_join(log_thread, NULL);*/
+
+  pthread_join(log_thread, NULL);
+  mq_close(log_queue);
+  printf("mq_close err: %s\n", strerror(errno));
+
+  pthread_join(log_thread, NULL);
 
 }
