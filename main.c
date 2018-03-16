@@ -26,9 +26,9 @@ struct mq_attr ipc_attr;          //attributes struct for ipc queue
 int main()
 {
   ipc_queue_init();      //main queue created
-  //temp_ipc_queue_init();      //temp sensor queue created
+  temp_ipc_queue_init();      //temp sensor queue created
 
-  //char ipc_queue_buff[128] = "testing from main\0";
+  char ipc_queue_buff[128];
 
   
   /*int checking;                    //check value for pthread creation
@@ -73,42 +73,48 @@ int main()
   else
   printf("log_queue == -1\n");*/
 
-  //mq_send(ipc_queue, "while testing outside\0", 128, 0);
-  while(bizzounce == 0)  //keeps the thread alive
-  {
-    //this for loop only for filling the ipc main queue
-    for(int i=0; i<5;i++)
+  int counter = 0;
+
+      for(int i=0; i<5;i++)
       {
-	printf("loop %d\n", i);
+	//printf("loop %d\n", i);
 	mq_send(ipc_queue, "testing 1\0",10, 0);
-
-	//printf("Error number while: %s\n\n", strerror(errno));
-	//usleep(10000);
       }
-    mq_getattr(ipc_queue, &ipc_attr);
-    printf("number of queued items: %ld\n",ipc_attr.mq_curmsgs);
-    
-    // this while loop for reading off the queue
 
+    mq_getattr(ipc_queue, &ipc_attr);
+    printf("number of queued items on main: %ld\n",ipc_attr.mq_curmsgs);
+    
+  while(bizzounce == 0)  //keeps the thread alive
+  { 
     while(ipc_attr.mq_curmsgs > 0)
       {
+	printf("shullfer_king called\n");
 	shuffler_king();
 	mq_getattr(ipc_queue, &ipc_attr);
-	printf("remaining on queue: %ld\n",ipc_attr.mq_curmsgs);
+	printf("remaining on queue: %ld\n\n",ipc_attr.mq_curmsgs);
+	counter++;
+	    printf("counter: %d\n",counter);
+	    usleep(1000);
       }
+    printf("counter: %d\n",counter);
+    //sleep(4);
     printf("done*******************\n");
     mq_getattr(ipc_queue, &ipc_attr);
-    printf("number of queued items: %ldn",ipc_attr.mq_curmsgs);
     bizzounce = 1;
   }
 
   mq_close(ipc_queue);
-  //mq_close(temp_ipc_queue);
+  mq_close(temp_ipc_queue);
   if(mq_unlink("/ipcmain") == -1)
     {
       	printf("unlink error: %s\n", strerror(errno));
     }
-  
+  if(mq_unlink("/ipctemperature") == -1)
+    {
+      printf("unlink error: %s\n", strerror(errno));
+    }
+
+
   /*pthread_join(tempops_thread, NULL);
   pthread_join(lightops_thread, NULL);
 
