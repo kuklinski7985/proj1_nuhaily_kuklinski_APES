@@ -19,7 +19,9 @@ file_t tempipcfile;
 int bizzounce;
 mqd_t log_queue;           //queue associated with logger
 mqd_t ipc_queue;           //queue associated with main thread
-mqd_t temp_ipc_queue;      //queue associated with temp sensor     
+mqd_t temp_ipc_queue;      //queue associated with temp sensor
+
+struct mq_attr ipc_attr;          //attributes struct for ipc queue
 
 int main()
 {
@@ -71,17 +73,32 @@ int main()
   else
   printf("log_queue == -1\n");*/
 
-
   //mq_send(ipc_queue, "while testing outside\0", 128, 0);
   while(bizzounce == 0)  //keeps the thread alive
   {
+    //this for loop only for filling the ipc main queue
     for(int i=0; i<5;i++)
       {
 	printf("loop %d\n", i);
 	mq_send(ipc_queue, "testing 1\0",10, 0);
+
 	//printf("Error number while: %s\n\n", strerror(errno));
-	usleep(10000);
+	//usleep(10000);
       }
+    mq_getattr(ipc_queue, &ipc_attr);
+    printf("number of queued items: %ld\n",ipc_attr.mq_curmsgs);
+    
+    // this while loop for reading off the queue
+
+    while(ipc_attr.mq_curmsgs > 0)
+      {
+	shuffler_king();
+	mq_getattr(ipc_queue, &ipc_attr);
+	printf("remaining on queue: %ld\n",ipc_attr.mq_curmsgs);
+      }
+    printf("done*******************\n");
+    mq_getattr(ipc_queue, &ipc_attr);
+    printf("number of queued items: %ldn",ipc_attr.mq_curmsgs);
     bizzounce = 1;
   }
 
@@ -104,6 +121,6 @@ int main()
   mq_close(log_queue);
   printf("mq_close err: %s\n", strerror(errno));
 
-  pthread_join(log_thread, NULL);
+  pthread_join(log_thread, NULL);*/
 
 }

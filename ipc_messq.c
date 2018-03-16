@@ -7,7 +7,7 @@ extern file_t tempipcfile;         //creates file where temperature queue info i
 extern mqd_t ipc_queue;           //queue associated with main thread
 extern mqd_t temp_ipc_queue;      //queue associated with temp sensor
 
-struct mq_attr ipc_attr;
+extern struct mq_attr ipc_attr;
 struct sigevent ipc_notify;       //when mq_notify for main triggers, function is called
 
 void shuffler_king()
@@ -20,7 +20,7 @@ void shuffler_king()
    */
   
   char ipc_queue_buff[IPC_ELEMENT_SIZE];
-  if (mq_getattr(ipc_queue, &ipc_attr) == -1)
+  /*if (mq_getattr(ipc_queue, &ipc_attr) == -1)
     {
         printf("getattr status: %s\n",strerror(errno));
 	return;
@@ -29,7 +29,7 @@ void shuffler_king()
   printf("number of elements in ipc_queue %ld\n", ipc_attr.mq_curmsgs);
 
 
-  do{
+  do{*/
     mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
     //printf("Error number receive: %s\n", strerror(errno) );
 
@@ -53,11 +53,11 @@ void shuffler_king()
       printf("Destination not valid\n");
     }
 
-    mq_getattr(ipc_queue, &ipc_attr);
+    //mq_getattr(ipc_queue, &ipc_attr);
     //mq_notify(ipc_queue, &ipc_notify);
   
-  }while(ipc_attr.mq_curmsgs != 0);
-  mq_notify(ipc_queue, &ipc_notify);
+    //}while(ipc_attr.mq_curmsgs != 0);
+    //mq_notify(ipc_queue, &ipc_notify);
 }
 
 void shuffler_mini()
