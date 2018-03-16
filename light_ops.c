@@ -20,18 +20,15 @@ void *light_ops()
 {
   char readbuf[2];
 
-  printf("entering light_ops\n");
-
   signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
   lightsensor = i2c_init(i2c_path, light_addr);
 
-  light_power_test();
-
-//  light_id_test();
-  light_r_id_reg(lightsensor, readbuf);
-  printf("Light ID Register: 0x%x\n", readbuf[0]);
-
-
+  if(light_power_test() == 2)
+  {
+    printf("Light sensor initialized. ID = 0x");
+    light_r_id_reg(lightsensor, readbuf);
+    printf("%x\n", readbuf[0]);
+  }
 
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   light_counter_init(delay_time);
@@ -51,20 +48,12 @@ void light_timer_handler(union sigval arg)
   char readbuf[2];
   int ch0;
   int ch1;
-  printf("Read data0: ");
   light_r_adc(lightsensor, 0, readbuf);
-  printf("%x %x\n", readbuf[1], readbuf[0]);
   ch0 = (int)readbuf[1] << 8 | (int)readbuf[0];
-  printf("Read data1: ");
   light_r_adc(lightsensor, 1, readbuf);
-  printf("%x %x\n", readbuf[1], readbuf[0]);
   ch1 = (int)readbuf[1] << 8 | (int)readbuf[0];
   printf("Lux: %f\n", counts_to_lux(ch0, ch1));
-  //display_c(light_readbuf);
-//  printf("Light sensor ID: %c\n", light_readbuf[0]);
-//  printf("Data 0: %d\n", light_r_adc0(lightsensor));
-
-  //display_k(light_readbuf);
+  light_w_timing_reg(lightsensor, GAIN_HIGH, INTEG_101MS, readbuf);
 }
 
 void light_counter_init(unsigned long long int firedelay)
@@ -102,30 +91,26 @@ void light_counter_init(unsigned long long int firedelay)
     }
 }
 
-void light_power_test()
+int light_power_test()
 {
   char readbuf[1];  // read buffer from light sensor
+  int pass_count = 0;
 
-  printf("--Power test--\n");
-  printf("Power off: \n");
-
-  /*i2c_write(lightsensor, pwr_reg, 2);
-  i2c_read(lightsensor, readbuf, 1);*/
   light_w_pwr(lightsensor, 0);
   light_r_pwr(lightsensor, readbuf);
-  printf("Power reg buf contents: ");
-  printf("%x", readbuf[0]);
-  printf("\n");
+  if(readbuf[0] == 0x00)
+  {
+    pass_count++;
+  }
 
-  printf("Power on: \n");
-  //pwr_reg[1] = CONTROL_BYTE;
-  /*i2c_write(lightsensor, pwr_reg, 2);
-  i2c_read(lightsensor, readbuf, 1);*/
   light_w_pwr(lightsensor, 1);
   light_r_pwr(lightsensor, readbuf);
-  printf("Power reg buf contents: ");
-  printf("%x", readbuf[0]);
-  printf("\n");
+  if(readbuf[0] == 0x03)
+  {
+    pass_count++;
+  }
+
+  return pass_count;
 
 }
 
@@ -133,7 +118,7 @@ float counts_to_lux(int ch0, int ch1)
 {
   float range = (float)ch1 / (float)ch0;
   float lux;
-  printf("ch0: %d ch1: %d range: %f\n", ch0, ch1, range);
+
   if(range > 1.3)
   {
     lux = 0;
