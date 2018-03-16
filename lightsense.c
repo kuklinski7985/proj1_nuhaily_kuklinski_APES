@@ -42,7 +42,7 @@ void light_r_pwr(int fd, char* readbuf) // must be run immediately after write t
   i2c_read(fd, readbuf, 1);
 }
 
-int light_r_adc(int fd, int adc_sel, char* readbuf)
+void light_r_adc(int fd, int adc_sel, char* readbuf)
 {
   char ctrl1[1];
   char ctrl2[1];
@@ -63,17 +63,45 @@ int light_r_adc(int fd, int adc_sel, char* readbuf)
 
   i2c_write(fd, ctrl1, 1);
   i2c_read(fd, temp, 1);
-  printf("\nADC sel %d:\n", adc_sel);
-  printf("DataL read: %x\n", temp[0]);
   readbuf[0] = temp[0];
   i2c_write(fd, ctrl2, 1);
   i2c_read(fd, temp, 1);
-  printf("DataH read: %x\n", temp[0]);
   readbuf[1] = temp[0];
+}
 
-//  i2c_read(fd, readbuf2, 2);
-//  strcat(readbuf, readbuf2);
+void light_w_timing_reg(int fd, int integ_tm, int gain, char* readbuf)
+{
+  char ctrl[2] = {CMD | TIMING, integ_tm | gain};
+  i2c_write(fd, ctrl, 2);
+  i2c_read(fd, readbuf, 2);
+//  printf("Timing reg response: %x %x\n", readbuf[0], readbuf[1]);
+    // having trouble deciphering the output of this guy
+}
 
-  return 0;
+void light_w_intr_ctrl(int fd, int en, char per, char* readbuf)
+{
+  char ctrl[2];
 
+  ctrl[0] = CMD | INTERRUPT;
+  ctrl[1] = en | per;
+  i2c_write(fd, ctrl, 2);
+  i2c_read(fd, readbuf, 2);
+}
+
+void light_w_intr_thresh_low(int fd, char low_byte, char high_byte)
+{
+  char ctrl[2] = {CMD | TLOW_L, low_byte};
+  i2c_write(fd, ctrl, 2);
+  ctrl[0] = CMD | TLOW_H;
+  ctrl[1] = high_byte;
+  i2c_write(fd, ctrl, 2);
+}
+
+void light_w_intr_thresh_high(int fd, char low_byte, char high_byte)
+{
+  char ctrl[2] = {CMD | THIGH_L, low_byte};
+  i2c_write(fd, ctrl, 2);
+  ctrl[0] = CMD | THIGH_H;
+  ctrl[1] = high_byte;
+  i2c_write(fd, ctrl, 2);
 }
