@@ -66,6 +66,6 @@ void light_r_adc(int fd, int adc_sel, char* readbuf);
 void light_w_timing_reg(int fd, int integ_tm, int gain, char* readbuf);
 void light_w_intr_ctrl(int fd, int en, char per, char* readbuf);
 void light_w_intr_thresh_low(int fd, char low_byte, char high_byte);
-void light_w_intr_thresh_high(int fd, char low_byte, char high_byte)
+void light_w_intr_thresh_high(int fd, char low_byte, char high_byte);
 
 #endif /*__lightsense_h_*/
