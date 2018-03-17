@@ -1,4 +1,8 @@
+<<<<<<< 687d30f7e87e3bdf484e257db114554af7b68079
 *.o
+=======
+*.o 
+>>>>>>> more changes
 *.d
 *.map
 *.elf
