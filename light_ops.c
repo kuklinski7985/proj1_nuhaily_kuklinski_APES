@@ -34,9 +34,18 @@ void *light_ops()
   ipcmessage_t ipc_msg;
   char msg_str[PAYLOAD_MAX_SIZE];
   light_previous = 1.0; // initialize at day-night border
-  signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
-  lightsensor = i2c_init(i2c_path, light_addr);
+  //signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
+  
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_LIGHT;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Light sensor ops thread initialized.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
 
+  lightsensor = i2c_init(i2c_path, light_addr);
   if(light_power_test() == 2) // transfer all this to a message that gets sent to main
   { // do not do printf here or anywhere outside of main (in final version)
     light_r_id_reg(lightsensor, sensorid);

@@ -8,7 +8,7 @@ pthread_mutex_t sprintf_mutex;
 
 extern int bizzounce;
 extern mqd_t log_queue;
-
+extern mqd_t ipc_queue;
 
 extern file_t logfile;
 
@@ -23,8 +23,19 @@ void* logger()
   char queue_buf[256];
  // char* queue_buf = (char)malloc(sizeof(char)*LOG_ELEMENT_SIZE);
   unsigned int prio;
+  ipcmessage_t ipc_msg;
+  char msg_str[256];
   //printf("***Entering log queue***\n***************\n");
   // Temporary manual set of logfile name
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_LOG;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Logger thread initialized.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+  
   strcpy(logfile.filename, "prj.log");
 
   fileCreate(&logfile);

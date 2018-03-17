@@ -31,6 +31,7 @@
 #include <mqueue.h>
 #include <errno.h>
 #include "sync_fileio.h"
+#include "../ipc_messq.h"
 
 #define LOG_MAX_ELEMENTS  64
 #define LOG_ELEMENT_SIZE  128

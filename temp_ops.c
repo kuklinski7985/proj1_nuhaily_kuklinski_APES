@@ -22,14 +22,23 @@ float temp_previous;
 
 void *temp_ops()
 {
- // printf("entering temp_ops\n");
-  temp_unit_sel = UNITS_F;
+  temp_unit_sel = UNITS_F;  // initial value
   signal(SIGUSR1, temp_ops_exit);    //signal handler for temp_ops function
   tempsensor = i2c_init(tempsense_path, temp_addr);
   unsigned long long int delay_time = 500000000;  //in nanoseconds
-  metric_counter_init(delay_time);
   char msg_str[256];
   ipcmessage_t ipc_msg;
+
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_TEMP;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Temp sensor ops thread initialized.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+
+  metric_counter_init(delay_time);
 
   while(bizzounce == 0)
     {
@@ -56,9 +65,6 @@ void handler_timer(union sigval arg)
   ipcmessage_t ipc_msg;  
 
   r_temp_reg(tempsensor, readbuf);
-  //display_c(readbuf);
-  //display_f(readbuf);
-  //display_k(readbuf);
 
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = DATA;
@@ -84,7 +90,7 @@ void handler_timer(union sigval arg)
   }
   
   build_ipc_msg(ipc_msg, msg_str);
- // decipher_ipc_msg(msg_str, &temp);
+ 
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
 }
 

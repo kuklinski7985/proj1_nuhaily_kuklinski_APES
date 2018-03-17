@@ -28,7 +28,7 @@ void shuffler_king()      //main Q, receives messages from all Q's
         break;
        case(IPC_LOG):
         //print_ipc_msg(ipc_msg);
-        manage_ipc_msg(ipc_msg, 1, log_str);
+        manage_ipc_msg(ipc_msg, log_str);
         mq_send(log_queue, log_str, strlen(log_str), 0);
         break;
       case(IPC_USER):
@@ -229,39 +229,54 @@ void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
   strcat(ipc_msg, "\n");
 }
 
-void manage_ipc_msg(ipcmessage_t msg, int log_en, char* log_str)
+void manage_ipc_msg(ipcmessage_t msg, char* log_str)
 {
   char tmp[256];
+  char loglevel[16];
+  char sourceid[64];
 
   switch(msg.type)
   {
     case(DATA):
-      //printf("%s", msg.timestamp);
-    //  strcpy(log_str, msg.timestamp);
-    // printf("1\n");
+      strcpy(loglevel, "DATA: ");
       if(msg.source == IPC_LIGHT)
       {
         //printf("Light sensor reads: %s lumens.\n", msg.payload);
-        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, "Light sensor reads: ", msg.payload, " lux");
+        sprintf(tmp, "%s%s%s%s%s.\n", msg.timestamp, loglevel, "Light sensor reads: ", msg.payload, " lux");
     
       }
       else if(msg.source == IPC_TEMP)
       {
-      //  printf("Temp sensor reads: %s degF.\n", msg.payload);
-        sprintf(tmp, "%s%s%s.\n", msg.timestamp, "Temp sensor reads: ", msg.payload);
-      } // we need to be able to switch between degree units, maybe another ipcmessage_t element for units?
+        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, loglevel, "Temp sensor reads: ", msg.payload);
+      }
       break;
-    case(INFO):    
-      if(msg.source == IPC_LIGHT || msg.source == IPC_TEMP)
+    case(INFO):
+      strcpy(loglevel, "INFO: "); 
+      if(msg.source == IPC_LIGHT) 
       {
-        sprintf(tmp, "%s\n", msg.payload);
-      }     
+        strcpy(sourceid, "Light sensor message: ");
+      }
+      else if(msg.source == IPC_TEMP)
+      {
+        strcpy(sourceid, "Temp sensor message: ");
+      }
+      else if(msg.source == IPC_LOG)
+      {
+        strcpy(sourceid, "Logger message: ");
+      }      
+      else
+      {
+        strcpy(sourceid, "err (sourceid) ");
+      }
+
+      snprintf(tmp, 256, "%s%s%s%s\n", msg.timestamp, loglevel, sourceid, msg.payload);
       break;
+
     default:
       break;
   }
   
   strcpy(log_str, tmp);
   printf("%s", log_str);
-}
 
+}
