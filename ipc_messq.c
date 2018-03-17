@@ -12,8 +12,10 @@ void shuffler_king()
 
 { 
   char ipc_queue_buff[IPC_ELEMENT_SIZE];
+  ipcmessage_t testing;
   mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
-  printf("Main Q read message: %s\n", ipc_queue_buff);
+  decipher_ipc_msg(ipc_queue_buff,&testing);
+  printf("Main Q read message: %s | %s\n", testing.payload, testing.timestamp);
 
     //change this to ipcmessage struct member destination
     int destination = 2;

@@ -44,14 +44,14 @@ int main()
   input1->member1 = 1234;
   pthread_attr_init(&attr);
 
-  /*checking = pthread_create(&log_thread, &attr, logger, (void*)input1);
+  checking = pthread_create(&log_thread, &attr, logger, (void*)input1);
   if(checking)
     {
       fprintf(stderr, "Error Creating log thread");
       return -1;
-      }*/
+      }
 
-  /*checking = pthread_create(&tempops_thread, &attr, temp_ops,(void*)input1);
+  checking = pthread_create(&tempops_thread, &attr, temp_ops,(void*)input1);
   if(checking)
     {
       fprintf(stderr, "Error Creating temp_ops thread");
@@ -65,13 +65,6 @@ int main()
     return -1;
   }
 
-
-/*  if(log_queue != -1)
-  {
-    printf("Trying to push to queue...\n");
-    mq_send(log_queue, "7", 1, 0);
-    printf("mq_send: %s\n", strerror(errno));
-  }*/
 
   
   /******only needed for seeding the main queue******/
@@ -94,7 +87,7 @@ int main()
 
       }
     mq_getattr(ipc_queue, &ipc_attr);
-    bizzounce = 1;
+    //bizzounce = 1;
   }
 
   mq_close(ipc_queue);

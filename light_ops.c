@@ -94,6 +94,7 @@ printf("counts to lux: %f\n", counts_to_lux(ch0, ch1));
   decipher_ipc_msg(msg_str, &temp);
   printf("deciphered components:\nTimestamp: %s\ntype: %d\nsource: %d\nsrc_pid: %d\ndestination: %d\npayload: %s\n", temp.timestamp, (message_t)temp.type, (location_t)temp.source, (int)temp.src_pid, (location_t)temp.destination, temp.payload);
   // now place on ipc queue, main can display and translate to log_type_t
+  mq_send(ipc_queue,msg_str,strlen(msg_str),0);
 }
 
 void light_counter_init(unsigned long long int firedelay)
