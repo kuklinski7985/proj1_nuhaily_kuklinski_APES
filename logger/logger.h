@@ -46,6 +46,7 @@ typedef enum
 
 typedef struct
 {
+  char timestamp[10];
   double float_data;
   char str_data[LOG_ELEMENT_SIZE];
   int int_data;

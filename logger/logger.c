@@ -35,7 +35,7 @@ void* logger()
   log_queue = mq_open("/log", O_CREAT | O_RDWR, 0666, &log_attr);
 
   printf("logger thread: log queue initialized: %d.\n", log_queue);
-  printf("logger error: %s\n", strerror(errno));
+  printf("create log mqueue error: %s\n", strerror(errno));
 
   qnotify.sigev_notify = SIGEV_THREAD;
   qnotify.sigev_notify_function = queueHasData;
@@ -46,7 +46,7 @@ void* logger()
     printf("mq_notify error: %s\n", strerror(errno));
   printf("Trying to push to queue from logger thread...\n");
   mq_send(log_queue, "9\0", 2, 0);
-  printf("mq_send: %s\n", strerror(errno));
+  printf("logger mq_send: %s\n", strerror(errno));
 
   signal(SIGUSR1, log_exit);    //signal handler for temp_ops function
 
@@ -90,24 +90,23 @@ void writeLogStr(file_t* logfile, log_struct_t logitem)
   char logfile_entry[LOG_LINE_SIZE];
   char ascii_buf[64];
 
-  pthread_mutex_lock(&log_mutex);
+  strcpy(logfile_entry, getCurrentTimeStr());
+
   printf("Writing element to log.\n");
   switch(logitem.msg_type) // needs timestamps
   {
     case ERROR:
-      strcpy(logfile_entry, getCurrentTimeStr());
+
       strcat(logfile_entry, "ERROR -- ");
       strcat(logfile_entry, logitem.str_data);
       strcat(logfile_entry, "\n");
       break;
     case MESSAGE:
-      strcpy(logfile_entry, getCurrentTimeStr());
       //strcat(logfile_entry, "");
   //    strcat(logfile_entry, *(logitem->str_data));
       strcat(logfile_entry, "\n");
       break;
     case TEMP:
-      strcpy(logfile_entry, getCurrentTimeStr());
       strcat(logfile_entry, "Temperature: ");
       sprintf(ascii_buf, "%f", logitem.float_data);
       strcat(logfile_entry, ascii_buf);
@@ -115,7 +114,6 @@ void writeLogStr(file_t* logfile, log_struct_t logitem)
       strcat(logfile_entry, "\n");
       break;
     case LIGHT:
-      strcpy(logfile_entry, getCurrentTimeStr());
       strcat(logfile_entry, "Lux: ");
       sprintf(ascii_buf, "%f", logitem.float_data);
       strcat(logfile_entry, ascii_buf);
@@ -126,6 +124,7 @@ void writeLogStr(file_t* logfile, log_struct_t logitem)
       break;
   }
 
+  pthread_mutex_lock(&log_mutex);
   fileWrite(logfile, logfile_entry);  // logfile is already a pointer no need to
                                       // pass address-of
   pthread_mutex_unlock(&log_mutex);
