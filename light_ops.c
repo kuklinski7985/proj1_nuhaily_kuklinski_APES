@@ -51,7 +51,7 @@ void *light_ops()
   ipc_msg.destination = IPC_LOG;
   ipc_msg.src_pid = getpid(); // pid_t
   //printf("1\n");
-  sprintf(ipc_msg.payload, "%s%x\0", "Connecting to light sensor: ID=0x", sensorid[0]);
+  sprintf(ipc_msg.payload, "%s%x%s", "Connecting to light sensor: ID=0x", sensorid[0], "\0");
  // printf("1\n");
   build_ipc_msg(ipc_msg, msg_str);
 //printf("2\n");
