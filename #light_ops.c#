@@ -6,7 +6,6 @@
 **/
 
 #include "light_ops.h"
-#include "ipc_messq.h"
 
 int bizzounce;
 
@@ -33,12 +32,8 @@ void *light_ops()
 
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   light_counter_init(delay_time);
-  while(bizzounce == 0)
-    {
-      mq_send(ipc_queue,"message from light to main\0",27, 0);
-      //usleep(500000);   //500000 sends every half a second
-      sleep(1);
-    }
+  while(bizzounce == 0);  //keeps the thread alive to process signals and timer requests
+
   return 0;
 }
 

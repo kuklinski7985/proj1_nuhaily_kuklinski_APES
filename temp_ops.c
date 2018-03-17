@@ -6,6 +6,7 @@
 **/
 
 #include "temp_ops.h"
+#include "ipc_messq.h"
 
 extern int bizzounce;
 int tempsensor;
@@ -25,7 +26,11 @@ void *temp_ops()
   tempsensor = i2c_init(tempsense_path, temp_addr);
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   metric_counter_init(delay_time);
-  while(bizzounce == 0);  //keeps the thread alive to process signals and timer requests
+  while(bizzounce == 0)
+    {
+      mq_send(ipc_queue,"message from temp to main\0",26, 0);
+      usleep(500000);   //500000 sends every half a second
+    }
 
   return 0;
 }

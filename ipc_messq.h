@@ -1,6 +1,6 @@
 /**
 * @file ipc_messq.h
-* @brief fxn prototypes for operation of tmp102 temperature sensor
+* @brief fxn prototypes for queue creation and use
 * @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/
@@ -24,10 +24,26 @@
 #include <ctype.h>
 #include <mqueue.h>
 #include <errno.h>
-
 #include "logger/logger.h"
 
+#define IPC_ELEMENT_SIZE   128
 
+extern file_t ipcfile;         //creates a file where queue info is stored, mounted
+extern file_t tempipcfile;     //creates file where temperature queue info is stored, mounted
+
+extern mqd_t ipc_queue;        //queue associated with main thread
+extern mqd_t temp_ipc_queue;    //queue associated with temp sensor
+extern mqd_t light_ipc_queue;
+
+extern struct mq_attr ipc_attr;
+struct mq_attr temp_ipc_attr;
+struct mq_attr light_ipc_attr;
+struct sigevent sigevent_temp_ipc_notify;
+
+struct sigevent sigevent_light_ipc_notify;
+
+
+extern struct mq_attr ipc_attr;
 
 #ifndef ipc_messq_h_
 #define ipc_messq_h_
@@ -49,19 +65,23 @@ typedef enum{
 /*struct to define messages passed around to all parts of the system*/
 
 typedef struct ipcmessage{
+  char* timestamp;
   message_t type;                   //message identifier
   location_t source;                //where message originates from
   pid_t src_pid;                    //pid of process creating the message
   location_t destination;           //final destination for message
-  long int sensedata;               //data being requested from sensors
-}ipcmessage_t;
-
+  char * payload;               //data being requested from sensors
+} ipcmessage_t;
 
 void ipc_queue_init();
 void shuffler_king();
 
 void temp_ipc_queue_init();
-void shuffler_mini();
+void shuffler_mini_temp();
+
+void light_ipc_queue_init();
+
+void shuffler_mini_light();
 
 
 #endif /* __ipc_messq_h_*/

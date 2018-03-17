@@ -31,4 +31,20 @@ typedef struct input_struct{
   int member1;
 } input_struct;
 
+pthread_t tempops_thread;    //creates new pthread
+pthread_t lightops_thread;    //creates new pthread
+pthread_t log_thread;
+pthread_attr_t attr;         //standard attributes for pthread
 
+file_t logfile;
+file_t ipcfile;             
+file_t tempipcfile;
+file_t lightipcfile;
+
+int bizzounce;
+mqd_t log_queue;           //queue associated with logger
+mqd_t ipc_queue;           //queue associated with main thread
+mqd_t temp_ipc_queue;      //queue associated with temp sensor
+mqd_t light_ipc_queue;
+
+struct mq_attr ipc_attr;          //attributes struct for ipc queue
