@@ -8,9 +8,11 @@ extern mqd_t ipc_queue;           //queue associated with main thread
 extern mqd_t temp_ipc_queue;      //queue associated with temp sensor
 
 extern struct mq_attr ipc_attr;
-struct sigevent ipc_notify;       //when mq_notify for main triggers, function is called
+struct mq_attr temp_ipc_attr;
+struct sigevent sigevent_temp_ipc_notify;       //when mq_notify for main triggers, function is called
 
 void shuffler_king()
+<<<<<<< HEAD
 {
   /*-called everytime a new entry on the queue is present
    *-need to: read queue entry: queueHasData fxn?
@@ -19,38 +21,41 @@ void shuffler_king()
    *-send message to that queue
    */
 
+=======
+{ 
+>>>>>>> f4ae3ed66d9984593a4d9f2665d65b872ee89050
   char ipc_queue_buff[IPC_ELEMENT_SIZE];
-  /*if (mq_getattr(ipc_queue, &ipc_attr) == -1)
-    {
-        printf("getattr status: %s\n",strerror(errno));
-	return;
-    }
+  
+  mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
+  printf("received message main queue: %s\n", ipc_queue_buff);
+  //sleep(1);
 
-  printf("number of elements in ipc_queue %ld\n", ipc_attr.mq_curmsgs);
-
-
-  do{*/
-    mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
-    //printf("Error number receive: %s\n", strerror(errno) );
-
-    //printf("received message: %s\n", ipc_queue_buff);
-
+<<<<<<< HEAD
     //change this to ipcmessage struct member destination
     int destination = 1;
 
     switch(destination){
+=======
+  //change this to ipcmessage struct member destination
+  int destination = 1;
+  
+  switch(destination){
+>>>>>>> f4ae3ed66d9984593a4d9f2665d65b872ee89050
     case(1):
-      //mq_send(temp_ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, 0);
+      mq_send(temp_ipc_queue,"message sent from main to temp\0",31, 0);
       printf("message sent to receipient\n");
       break;
     case(2):
+      //mq_send(light_ipc_queue,"message from main to light\0",27, 0);
       printf("case 2\n");
       break;
     case(3):
+      //mq_send(logger_ipc_queue, "message from main to logger\0",28,0);
       printf("case 3\n");
       break;
     default:
       printf("Destination not valid\n");
+<<<<<<< HEAD
     }
 
     //mq_getattr(ipc_queue, &ipc_attr);
@@ -58,28 +63,46 @@ void shuffler_king()
 
     //}while(ipc_attr.mq_curmsgs != 0);
     //mq_notify(ipc_queue, &ipc_notify);
+=======
+  }
+>>>>>>> f4ae3ed66d9984593a4d9f2665d65b872ee89050
 }
 
 void shuffler_mini()
 {
-  //char temp_ipc_queue_buff[IPC_ELEMENT_SIZE];
-  //mq_receive(temp_ipc_queue, temp_ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
-  printf("entering and exit shuffler mini for temp thread\n");
-  //printf("received: %s\n",temp_ipc_queue_buff);
+  char temp_ipc_queue_buff[IPC_ELEMENT_SIZE];
+  if (mq_notify(temp_ipc_queue, &sigevent_temp_ipc_notify) == -1)
+    {
+      printf("mq_notify error: %s\n", strerror(errno));
+    }
+  
+  mq_getattr(temp_ipc_queue, &temp_ipc_attr);
+  while(temp_ipc_attr.mq_curmsgs > 0)
+    {
+      mq_receive(temp_ipc_queue, temp_ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
+      mq_getattr(temp_ipc_queue, &temp_ipc_attr);
+      printf("remaining on temp queue %ld\n",temp_ipc_attr.mq_curmsgs);
+      printf("temp queue received: %s\n",temp_ipc_queue_buff);
+    }
+  mq_send(ipc_queue,"message from temp to main\0",26, 0);
 }
 
-//creates ipc queue and establishes sig_notify when there is an item on the queue
 void ipc_queue_init()
 {
   //struct mq_attr ipc_attr;
+<<<<<<< HEAD
   //struct sigevent ipc_notify;       //when mq_notify for main triggers, function is called
 
+=======
+  
+>>>>>>> f4ae3ed66d9984593a4d9f2665d65b872ee89050
   ipc_attr.mq_maxmsg = 255;
   ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
   ipc_attr.mq_flags = 0;
 
   ipc_queue = mq_open("/ipcmain", O_CREAT | O_RDWR, 0666, &ipc_attr);
 
+<<<<<<< HEAD
   //printf("main IPC queue status: ID %d | %s\n", ipc_queue, strerror(errno));
 
   ipc_notify.sigev_notify = SIGEV_THREAD;
@@ -92,10 +115,17 @@ void ipc_queue_init()
 }
 
 //function that creates a queue for the temp sensor thread and initializes the sig notify
+=======
+  //ipc_notify.sigev_notify = SIGEV_THREAD;
+  //ipc_notify.sigev_notify_function = shuffler_king;   //fxn to call when triggered
+  //ipc_notify.sigev_notify_attributes = NULL;
+  //ipc_notify.sigev_value.sival_ptr = NULL;
+}
+
+>>>>>>> f4ae3ed66d9984593a4d9f2665d65b872ee89050
 void temp_ipc_queue_init()
 {
-  struct mq_attr temp_ipc_attr;
-  struct sigevent temp_ipc_notify;       //when mq_notify triggers, function is called
+  //struct mq_attr temp_ipc_attr;
 
   temp_ipc_attr.mq_maxmsg = 255;
   temp_ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
@@ -103,6 +133,7 @@ void temp_ipc_queue_init()
 
   temp_ipc_queue = mq_open("/ipctemperature", O_CREAT | O_RDWR, 0666, &temp_ipc_attr);
 
+<<<<<<< HEAD
   printf("temperature IPC queue status: ID %d | %s\n", temp_ipc_queue, strerror(errno));
 
   temp_ipc_notify.sigev_notify = SIGEV_THREAD;
@@ -113,6 +144,17 @@ void temp_ipc_queue_init()
 
   printf("temperature mq_notify status: %s\n", strerror(errno));
 
+=======
+  sigevent_temp_ipc_notify.sigev_notify = SIGEV_THREAD;
+  sigevent_temp_ipc_notify.sigev_notify_function = shuffler_mini;   //fxn to call when triggered
+  sigevent_temp_ipc_notify.sigev_notify_attributes = NULL;
+  sigevent_temp_ipc_notify.sigev_value.sival_ptr = NULL;
+  if (mq_notify(temp_ipc_queue, &sigevent_temp_ipc_notify) == -1)
+    {
+      printf("mq_notify error: %s\n", strerror(errno));
+    }
+  
+>>>>>>> f4ae3ed66d9984593a4d9f2665d65b872ee89050
 }
 
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
