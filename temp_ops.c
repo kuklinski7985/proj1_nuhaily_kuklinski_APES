@@ -65,7 +65,7 @@ void handler_timer(union sigval arg)
 
   sprintf(ipc_msg.payload, "%f", display_f(readbuf));
   build_ipc_msg(ipc_msg, msg_str);
-  decipher_ipc_msg(msg_str, &temp);
+ // decipher_ipc_msg(msg_str, &temp);
   mq_send(ipc_queue,msg_str,strlen(msg_str),0);
 }
 

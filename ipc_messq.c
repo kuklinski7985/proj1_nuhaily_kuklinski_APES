@@ -13,14 +13,14 @@ void shuffler_king()      //main Q, receives messages from all Q's
   char ipc_queue_buff[IPC_ELEMENT_SIZE];
   char log_str[IPC_ELEMENT_SIZE];
   ipcmessage_t ipc_msg;
-  //mq_receive(ipc_queue, msg_str,256,NULL);
+
   mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
   decipher_ipc_msg(ipc_queue_buff, &ipc_msg);
-  //decipher_ipc_msg(msg_str, &ipc_msg);
+
   //printf("Main Q read message: %s | %s | %d\n", testing.payload, testing.timestamp, testing.destination);
   //printf("destination: %d\n", ipc_msg.destination);
 
-  switch(ipc_msg.destination){
+  switch(ipc_msg.destination) {
       case(IPC_MAIN):
         //add functionality to process message
         //doesnt need to send out message like others
@@ -232,7 +232,7 @@ void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
 void manage_ipc_msg(ipcmessage_t msg, int log_en, char* log_str)
 {
   char tmp[256];
- // printf("55\n");
+
   switch(msg.type)
   {
     case(DATA):
@@ -247,16 +247,15 @@ void manage_ipc_msg(ipcmessage_t msg, int log_en, char* log_str)
       }
       else if(msg.source == IPC_TEMP)
       {
-        printf("Temp sensor reads: %s degF.\n", msg.payload);
+      //  printf("Temp sensor reads: %s degF.\n", msg.payload);
+        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, "Temp sensor reads: ", msg.payload, " degF");
       } // we need to be able to switch between degree units, maybe another ipcmessage_t element for units?
       break;
-    case(INFO):
-      //  printf("64\n");    
+    case(INFO):    
       if(msg.source == IPC_LIGHT || msg.source == IPC_TEMP)
       {
         sprintf(tmp, "%s\n", msg.payload);
-      }
-      //  printf("66\n");      
+      }     
       break;
     default:
       break;

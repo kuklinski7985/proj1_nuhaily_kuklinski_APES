@@ -39,7 +39,7 @@ int main()
   //char* test_entry = "7\n";
   char buf1[255];
 
-  //remote_socket_server_init();
+ // remote_socket_server_init();
 
 
   input1 = (input_struct*)malloc(sizeof(input_struct));
@@ -67,11 +67,11 @@ int main()
     return -1;
   }
 
-  checking = pthread_create(&socket_thread, &attr, remote_socket_server_init,(void*)input1);
+ /* checking = pthread_create(&socket_thread, &attr, remote_socket_server_init,(void*)input1);
   {
     fprintf(stderr, "Error creating socket thread");
     return -1;
-  }
+  }*/
 
 
   //printf("Bizzounce before entering while loop: %d\n", bizzounce);

@@ -55,6 +55,7 @@ void* logger()
       mq_receive(log_queue, queue_buf, 256, &prio);
       writeLogStr(&logfile, queue_buf);
       mq_getattr(log_queue, &log_attr);
+      memset(queue_buf, 0, strlen(queue_buf));
     }
 
   }
@@ -70,7 +71,7 @@ static void logger_handler()
   // open file
   // read from queue
   mq_receive(log_queue, queue_buf, LOG_ELEMENT_SIZE, &prio);
-  printf("**log queue received data**\n");
+ // printf("**log queue received data**\n");
 
   //printf("Data received: %s\n", queue_buf);
   // add to file
