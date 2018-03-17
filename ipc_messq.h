@@ -26,8 +26,11 @@
 #include <errno.h>
 #include "logger/logger.h"
 
+#ifndef ipc_messq_h_
+#define ipc_messq_h_
 
 #define IPC_ELEMENT_SIZE   128
+#define PAYLOAD_MAX_SIZE   256
 
 extern file_t ipcfile;         //creates a file where queue info is stored, mounted
 extern file_t tempipcfile;     //creates file where temperature queue info is stored, mounted
@@ -40,35 +43,25 @@ extern struct mq_attr ipc_attr;
 struct mq_attr temp_ipc_attr;
 struct mq_attr light_ipc_attr;
 struct sigevent sigevent_temp_ipc_notify;
-
 struct sigevent sigevent_light_ipc_notify;
 
-#define PAYLOAD_MAX_SIZE    256
-
-#define PAYLOAD_MAX_SIZE    256
-
 extern struct mq_attr ipc_attr;
-
-#ifndef ipc_messq_h_
-#define ipc_messq_h_
 
 extern mqd_t ipc_queue;
 extern file_t ipcfile;
 
 /*types of messages that are possible*/
 typedef enum{
-  QUERRY, DATA, INFO, TERMINATE
+  QUERY, DATA, INFO, TERMINATE
 } message_t;
 
 /*locations messages can be sent to and received from*/
 typedef enum{
-  IPC_LOG, IPC_TEMP, IPC_LIGHT, IPC_MAIN, IPC_SOCKET, IPC_USER
+  IPC_NONE, IPC_LOG, IPC_TEMP, IPC_LIGHT, IPC_MAIN, IPC_SOCKET, IPC_USER
 } location_t;
 
 
 /*struct to define messages passed around to all parts of the system*/
-
-
 typedef struct ipcmessage {
   char timestamp[10];
   message_t type;                   //message identifier

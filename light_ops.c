@@ -80,21 +80,22 @@ void light_timer_handler(union sigval arg)
 //printf("1\n");
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
 //printf("1.5\n");
-  ipc_msg.type = LIGHT;
+  ipc_msg.type = DATA;
   ipc_msg.source = IPC_LIGHT;
   ipc_msg.destination = IPC_LOG;
   ipc_msg.src_pid = getpid(); // pid_t
-printf("counts to lux: %f\n", counts_to_lux(ch0, ch1));
+//printf("counts to lux: %f\n", counts_to_lux(ch0, ch1));
   sprintf(ipc_msg.payload, "%f", counts_to_lux(ch0, ch1));
 //  printf("temp_str: %s\n", temp_str);
 //printf("3\n");
   build_ipc_msg(ipc_msg, msg_str);
-  printf("IPC string:\n%s\n", msg_str);
+//  printf("IPC string:\n%s\n", msg_str);
 //printf("4\n");
   decipher_ipc_msg(msg_str, &temp);
-  printf("deciphered components:\nTimestamp: %s\ntype: %d\nsource: %d\nsrc_pid: %d\ndestination: %d\npayload: %s\n", temp.timestamp, (message_t)temp.type, (location_t)temp.source, (int)temp.src_pid, (location_t)temp.destination, temp.payload);
+//  printf("deciphered components:\nTimestamp: %s\ntype: %d\nsource: %d\nsrc_pid: %d\ndestination: %d\npayload: %s\n", temp.timestamp, (message_t)temp.type, (location_t)temp.source, (int)temp.src_pid, (location_t)temp.destination, temp.payload);
   // now place on ipc queue, main can display and translate to log_type_t
   mq_send(ipc_queue,msg_str,strlen(msg_str),0);
+//  printf("IPC queue status from light thread: %s\n", strerror(errno));
 }
 
 void light_counter_init(unsigned long long int firedelay)

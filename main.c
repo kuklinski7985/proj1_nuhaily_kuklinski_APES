@@ -66,7 +66,7 @@ int main()
   }
 
 
-  
+  printf("Bizzounce before entering while loop: %d\n", bizzounce);
   /******only needed for seeding the main queue******/
 
   mq_send(ipc_queue, "Seeding Message\0",16, 0);
@@ -80,18 +80,22 @@ int main()
 
 	      shuffler_king();
 	      mq_getattr(ipc_queue, &ipc_attr);
-	      //printf("remaining on queue: %ld\n\n",ipc_attr.mq_curmsgs);
+	  //    printf("remaining on queue: %ld\n\n",ipc_attr.mq_curmsgs);
         //printf("counter: %d\n",counter);
+        
 	      usleep(2000);
       //mq_send(ipc_queue, "while testing outside\0", 128, 0);
 
       }
     mq_getattr(ipc_queue, &ipc_attr);
+ //   printf("IPC queue status: %s\n", strerror(errno));
+  //   printf("Bizzounce inside while loop: %d\n", bizzounce);
     //bizzounce = 1;
   }
 
   mq_close(ipc_queue);
   mq_close(temp_ipc_queue);
+  mq_close(light_ipc_queue);
   if(mq_unlink("/ipcmain") == -1)
     {
       	printf("unlink error: %s\n", strerror(errno));
@@ -110,7 +114,7 @@ int main()
 
   pthread_join(log_thread, NULL);
   mq_close(log_queue);
-
+  
 
 
   /*pthread_join(log_thread, NULL);

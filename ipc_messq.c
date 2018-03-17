@@ -8,30 +8,30 @@
 #include "ipc_messq.h"
 
 void shuffler_king()
-
-
 { 
   char ipc_queue_buff[IPC_ELEMENT_SIZE];
-  ipcmessage_t testing;
+  ipcmessage_t ipc_msg;
   mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
-  decipher_ipc_msg(ipc_queue_buff,&testing);
-  printf("Main Q read message: %s | %s\n", testing.payload, testing.timestamp);
-
+  decipher_ipc_msg(ipc_queue_buff, &ipc_msg);
+  //printf("Main Q read message: %s | %s | %d\n", testing.payload, testing.timestamp, testing.destination);
+  //printf("destination: %d\n", ipc_msg.destination);
     //change this to ipcmessage struct member destination
-    int destination = 2;
+  //int destination = 2;
 
-  switch(destination){
-    case(1):
-      mq_send(temp_ipc_queue,"message sent from main to temp\0",31, 0);
+  switch(ipc_msg.destination){
+    case(IPC_MAIN):
+    //  mq_send(temp_ipc_queue,"message sent from main to temp\0",31, 0);
       break;
-    case(2):
-      mq_send(light_ipc_queue,"message from main to light\0",27, 0);
+    case(IPC_LOG):
+     // mq_send(light_ipc_queue,"message from main to light\0",27, 0);
+      printf("Data receieved from queue:\n%s\n", ipc_queue_buff);
       break;
-    case(3):
+    case(IPC_USER):
       //mq_send(logger_ipc_queue, "message from main to logger\0",28,0);
       break;
+    case(IPC_NONE):
     default:
-      printf("Destination not valid\n");
+      printf("Destination %d not valid\n", ipc_msg.destination);
 
   }
 }
@@ -61,8 +61,8 @@ void ipc_queue_init()
   ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
   ipc_attr.mq_flags = 0;
 
-  ipc_queue = mq_open("/ipcmain", O_CREAT | O_RDWR, 0666, &ipc_attr);
-
+  ipc_queue = mq_open("/ipc_main", O_CREAT | O_RDWR, 0666, &ipc_attr);
+  printf("IPC queue init status: %s\n", strerror(errno));
 }
 
 void temp_ipc_queue_init()
@@ -100,7 +100,7 @@ void light_ipc_queue_init()
   sigevent_light_ipc_notify.sigev_notify_function = shuffler_mini_light;
   sigevent_light_ipc_notify.sigev_notify_attributes = NULL;
   sigevent_light_ipc_notify.sigev_value.sival_ptr = NULL;
-  if (mq_notify(temp_ipc_queue, &sigevent_temp_ipc_notify) == -1)
+  if (mq_notify(light_ipc_queue, &sigevent_light_ipc_notify) == -1)
     {
       printf("mq_notify error: %s\n", strerror(errno));
     }
@@ -139,7 +139,7 @@ void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
   {
     msg_struct->timestamp[j] = ipc_msg[i];
   }
-
+ // msg_struct->timestamp[j] = '\0';
   // message type
   for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
   {
@@ -173,7 +173,8 @@ void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
   {
     msg_struct->payload[j] = ipc_msg[i];
   }
-
+//  msg_struct->payload[j] = '\0';
+ // printf("payload: %s\n", msg_struct->payload);
 }
 
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
@@ -200,7 +201,7 @@ void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
   strcat(ipc_msg, "\n");
   //printf("f\n");
   strcat(ipc_msg, msg_struct.payload);
-  strcat(ipc_msg, "\0"); // mq_ queues need a null character appended (may not be necessary because of strcat)
+  strcat(ipc_msg, "\n"); // mq_ queues need a null character appended (may not be necessary because of strcat)
 }
 
 
