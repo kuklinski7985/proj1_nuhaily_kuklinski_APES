@@ -84,6 +84,6 @@ void shuffler_mini_light();
 
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg);
 void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct);
-
+void print_ipc_msg(ipcmessage_t msg);
 
 #endif /* __ipc_messq_h_*/

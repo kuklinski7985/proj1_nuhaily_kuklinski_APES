@@ -62,10 +62,10 @@ void w_config_reg(int fd, char * buff)
 
   char config_reg_val[1] = {0};
   i2c_read(fd,config_reg_val,1);
-  printf("config_reg: %x\n",config_reg_val[0]);
+  //printf("config_reg: %x\n",config_reg_val[0]);
 
   config_reg_val[0] |= buff[0];
-  printf("config_reg: %x\n",config_reg_val[0]);
+  //printf("config_reg: %x\n",config_reg_val[0]);
 
   //i2c_write(fd, reg_pick, 1);
   i2c_write(fd,config_reg_val,1);
@@ -127,7 +127,7 @@ int r_config_reg(int fd)
   char config_reg_val[1] = {0};
   i2c_read(fd,config_reg_val,1);
 
-  printf("current configuration value: %x\n",config_reg_val[0]);
+  //printf("current configuration value: %x\n",config_reg_val[0]);
 
   return config_reg_val[0];
 }

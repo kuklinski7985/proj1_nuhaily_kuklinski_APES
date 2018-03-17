@@ -24,7 +24,7 @@ void shuffler_king()
       break;
     case(IPC_LOG):
      // mq_send(light_ipc_queue,"message from main to light\0",27, 0);
-      printf("Data receieved from queue:\n%s\n", ipc_queue_buff);
+      print_ipc_msg(ipc_msg);
       break;
     case(IPC_USER):
       //mq_send(logger_ipc_queue, "message from main to logger\0",28,0);
@@ -139,7 +139,7 @@ void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
   {
     msg_struct->timestamp[j] = ipc_msg[i];
   }
- // msg_struct->timestamp[j] = '\0';
+  msg_struct->timestamp[j] = '\0';
   // message type
   for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
   {
@@ -201,7 +201,26 @@ void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
   strcat(ipc_msg, "\n");
   //printf("f\n");
   strcat(ipc_msg, msg_struct.payload);
-  strcat(ipc_msg, "\n"); // mq_ queues need a null character appended (may not be necessary because of strcat)
+  strcat(ipc_msg, "\n");
 }
 
-
+void print_ipc_msg(ipcmessage_t msg)
+{
+  char tmp[256];
+  switch(msg.type)
+  {
+    case(DATA):
+      printf("%s", msg.timestamp);
+      if(msg.source == IPC_LIGHT)
+      {
+        printf("Light sensor reads: %s lumens.\n", msg.payload);
+      }
+      else if(msg.source == IPC_TEMP)
+      {
+        printf("Temp sensor reads: %s degF.\n", msg.payload);
+      } // we need to be able to switch between degree units, maybe another ipcmessage_t element for units?
+      break;
+    default:
+      break;
+  }
+}

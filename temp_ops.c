@@ -46,7 +46,7 @@ void handler_timer(union sigval arg)
   //
   r_temp_reg(tempsensor,readinfo);
   //display_c(readinfo);
-  display_f(readinfo);
+  //display_f(readinfo);
   //display_k(readinfo);
 }
 

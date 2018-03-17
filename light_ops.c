@@ -48,7 +48,7 @@ void *light_ops()
 
   while(bizzounce == 0)
     {
-      mq_send(ipc_queue,"message from light to main\0",27, 0);
+      //mq_send(ipc_queue,"message from light to main\0",27, 0);
       //usleep(500000);   //500000 sends every half a second
       sleep(1);
     }
