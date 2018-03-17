@@ -45,6 +45,7 @@ void *light_ops()
 
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   light_counter_init(delay_time);
+
   while(bizzounce == 0)
     {
       mq_send(ipc_queue,"message from light to main\0",27, 0);
@@ -52,6 +53,7 @@ void *light_ops()
       sleep(1);
     }
   return 0;
+
 }
 
 void light_ops_exit(int signum)

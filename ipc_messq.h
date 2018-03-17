@@ -26,6 +26,7 @@
 #include <errno.h>
 #include "logger/logger.h"
 
+
 #define IPC_ELEMENT_SIZE   128
 
 extern file_t ipcfile;         //creates a file where queue info is stored, mounted
@@ -42,6 +43,7 @@ struct sigevent sigevent_temp_ipc_notify;
 
 struct sigevent sigevent_light_ipc_notify;
 
+#define PAYLOAD_MAX_SIZE    256
 
 #define PAYLOAD_MAX_SIZE    256
 
@@ -66,39 +68,29 @@ typedef enum{
 
 /*struct to define messages passed around to all parts of the system*/
 
-<<<<<<< HEAD
-typedef struct ipcmessage{
-  char* timestamp;
-=======
+
 typedef struct ipcmessage {
   char timestamp[10];
->>>>>>> 722f41353ffab0040e92ac4ea5ca58bf7b45667a
   message_t type;                   //message identifier
   location_t source;                //where message originates from
   pid_t src_pid;                    //pid of process creating the message
   location_t destination;           //final destination for message
-<<<<<<< HEAD
-  char * payload;               //data being requested from sensors
-=======
   char payload[PAYLOAD_MAX_SIZE];   // message to transmit
->>>>>>> 722f41353ffab0040e92ac4ea5ca58bf7b45667a
 } ipcmessage_t;
 
 void ipc_queue_init();
 void shuffler_king();
 
 void temp_ipc_queue_init();
-<<<<<<< HEAD
+
 void shuffler_mini_temp();
 
 void light_ipc_queue_init();
 
 void shuffler_mini_light();
 
-=======
-void shuffler_mini();
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg);
 void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct);
->>>>>>> 722f41353ffab0040e92ac4ea5ca58bf7b45667a
+
 
 #endif /* __ipc_messq_h_*/
