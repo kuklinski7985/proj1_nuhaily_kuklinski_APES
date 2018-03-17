@@ -9,12 +9,11 @@
 #include "ipc_messq.h"
 
 extern int bizzounce;
-int tempsensor;
 
 int tempsensor;          //used for return value for open(), file indicator
 
 int temp_addr = 0x48;       //slave address for the temp sensor
-char readinfo[2] = {0};    //array for reading and sending data to sensor
+//char readinfo[2] = {0};    //array for reading and sending data to sensor
 char writeinfo[2] = {0};
 char * tempsense_path = "/dev/i2c-2";
 
@@ -26,10 +25,14 @@ void *temp_ops()
   tempsensor = i2c_init(tempsense_path, temp_addr);
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   metric_counter_init(delay_time);
+  char msg_str[256];
+  ipcmessage_t ipc_msg;
+
   while(bizzounce == 0)
     {
-      mq_send(ipc_queue,"message from temp to main\0",26, 0);
-      usleep(500000);   //500000 sends every half a second
+      //mq_send(ipc_queue,"message from temp to main\0",26, 0);
+      //usleep(500000);   //500000 sends every half a second
+
     }
 
   return 0;
@@ -43,11 +46,27 @@ void temp_ops_exit(int signum)
 
 void handler_timer(union sigval arg)
 {
-  //
-  r_temp_reg(tempsensor,readinfo);
-  //display_c(readinfo);
-  //display_f(readinfo);
-  //display_k(readinfo);
+  char readbuf[2] = {0};
+  char msg_str[256];     //holds created string
+  char temp_str[256];
+  ipcmessage_t temp;     //decipered string into ipcmessage_t
+  ipcmessage_t ipc_msg;  
+
+  r_temp_reg(tempsensor,readbuf);
+  //display_c(readbuf);
+  //display_f(readbuf);
+  //display_k(readbuf);
+
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = DATA;
+  ipc_msg.source = IPC_TEMP;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+
+  sprintf(ipc_msg.payload, "%f", display_f(readbuf));
+  build_ipc_msg(ipc_msg, msg_str);
+  decipher_ipc_msg(msg_str, &temp);
+  mq_send(ipc_queue,msg_str,strlen(msg_str),0);
 }
 
 void metric_counter_init(unsigned long long int firedelay)

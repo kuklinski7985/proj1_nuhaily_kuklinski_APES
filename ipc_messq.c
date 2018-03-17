@@ -7,32 +7,40 @@
 
 #include "ipc_messq.h"
 
-void shuffler_king()
+void shuffler_king()      //main Q, receives messages from all Q's
 { 
-  char ipc_queue_buff[IPC_ELEMENT_SIZE];
+  //char msg_str[256];
   ipcmessage_t ipc_msg;
+  //mq_receive(ipc_queue, msg_str,256,NULL);
+  char ipc_queue_buff[IPC_ELEMENT_SIZE];
   mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
   decipher_ipc_msg(ipc_queue_buff, &ipc_msg);
+  //decipher_ipc_msg(msg_str, &ipc_msg);
   //printf("Main Q read message: %s | %s | %d\n", testing.payload, testing.timestamp, testing.destination);
   //printf("destination: %d\n", ipc_msg.destination);
-    //change this to ipcmessage struct member destination
-  //int destination = 2;
 
   switch(ipc_msg.destination){
-    case(IPC_MAIN):
-    //  mq_send(temp_ipc_queue,"message sent from main to temp\0",31, 0);
-      break;
-    case(IPC_LOG):
-     // mq_send(light_ipc_queue,"message from main to light\0",27, 0);
-      print_ipc_msg(ipc_msg);
-      break;
-    case(IPC_USER):
-      //mq_send(logger_ipc_queue, "message from main to logger\0",28,0);
-      break;
-    case(IPC_NONE):
-    default:
-      printf("Destination %d not valid\n", ipc_msg.destination);
-
+      case(IPC_MAIN):
+        //add functionality to process message
+        //doesnt need to send out message like others
+        //print_ipc_msg(ipc_msg);
+        break;
+       case(IPC_LOG):
+        print_ipc_msg(ipc_msg);
+        break;
+      case(IPC_USER):
+        break;
+      case(IPC_TEMP):
+        mq_send(temp_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
+        break;
+      case(IPC_LIGHT):
+        mq_send(light_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
+        print_ipc_msg(ipc_msg);
+        printf("light case*****************\n");
+        break;
+      case(IPC_NONE):
+      default:
+        printf("Destination %d not valid\n", ipc_msg.destination);
   }
 }
 

@@ -10,6 +10,7 @@
 pthread_t tempops_thread;    //creates new pthread
 pthread_t lightops_thread;    //creates new pthread
 pthread_t log_thread;
+pthread_t socket_thread;
 
 pthread_attr_t attr;         //standard attributes for pthread
 file_t logfile;
@@ -65,6 +66,12 @@ int main()
     return -1;
   }
 
+  checking = pthread_create(&socket_thread, &attr, remote_socket_server_init,(void*)input);
+  {
+    fprintf(stderr, "Error creating socket thread");
+    return -1;
+  }
+
 
   printf("Bizzounce before entering while loop: %d\n", bizzounce);
   /******only needed for seeding the main queue******/
@@ -108,12 +115,11 @@ int main()
 
   pthread_join(tempops_thread, NULL);
 
-  pthread_join(tempops_thread, NULL);
-
   pthread_join(lightops_thread, NULL);
 
   pthread_join(log_thread, NULL);
-  mq_close(log_queue);
+
+  pthread_join(socket_thread,NULL);
   
 
 

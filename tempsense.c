@@ -138,7 +138,7 @@ float display_c(char * buff)
   float celsius;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
   celsius = temp_final * 0.0625;
-  printf("degree-C: %04f\n",celsius);
+  //printf("degree-C: %04f\n",celsius);
   return celsius;
 }
 
@@ -148,7 +148,7 @@ float display_f(char * buff)
   float farh;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
   farh = (1.8*(temp_final * 0.0625) +32);
-  printf("degree-F: %04f\n",farh);
+  //printf("degree-F: %04f\n",farh);
   return farh;
 }
 
@@ -158,6 +158,6 @@ float display_k(char * buff)
   float kelvin;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
   kelvin = (temp_final * 0.0625) + 273.15;
-  printf("degree-K: %04f\n",kelvin);
+  //printf("degree-K: %04f\n",kelvin);
   return kelvin;
 }

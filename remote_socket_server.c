@@ -79,6 +79,7 @@ int remote_socket_server_init()
       printf("Server message sent to client\n");
     }
     
+    while(bizzounce == 0);
 
   return 0;
 }
