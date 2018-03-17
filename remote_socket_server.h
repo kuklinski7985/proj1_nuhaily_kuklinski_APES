@@ -26,7 +26,7 @@
  *@return VOID
  */
 
-int remote_socket_server_init();
+void *remote_socket_server_init();
 
 #endif /*__remote_socket_h_*/
 

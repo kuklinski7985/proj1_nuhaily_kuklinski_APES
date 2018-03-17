@@ -15,7 +15,9 @@ typedef struct teststruct{
 
 #define MYPORT 8080
 
-int remote_socket_server_init()
+extern int bizzounce;
+
+void *remote_socket_server_init()
 {
   struct sockaddr_in addr;
   //struct sockaddr_in sock_addr;
@@ -39,13 +41,12 @@ int remote_socket_server_init()
   if(sock_handle == 0)
     {
       printf("socket allocation failed\n");
-      return -1;
     }
 
   if(setsockopt(sock_handle, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
       printf("error with setsockopt\n");
-      return -1;
+ 
     }
 
   addr.sin_family = AF_INET;
@@ -55,7 +56,6 @@ int remote_socket_server_init()
   if(bind(sock_handle, (struct sockaddr*)&addr,sizeof(addr)))
     {
       printf("error on bind\n");
-      return -1;
     }
 
   printf("Listening mode for server\n");
@@ -67,7 +67,6 @@ int remote_socket_server_init()
       if(server_sock < 0)
 	{
 	  printf("Accept failure\n");
-	  return -1;
 	}
 
       
@@ -81,5 +80,4 @@ int remote_socket_server_init()
     
     while(bizzounce == 0);
 
-  return 0;
 }

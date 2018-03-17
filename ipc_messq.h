@@ -29,7 +29,7 @@
 #ifndef ipc_messq_h_
 #define ipc_messq_h_
 
-#define IPC_ELEMENT_SIZE   128
+#define IPC_ELEMENT_SIZE   256
 #define PAYLOAD_MAX_SIZE   256
 
 extern file_t ipcfile;         //creates a file where queue info is stored, mounted
@@ -38,6 +38,7 @@ extern file_t tempipcfile;     //creates file where temperature queue info is st
 extern mqd_t ipc_queue;        //queue associated with main thread
 extern mqd_t temp_ipc_queue;    //queue associated with temp sensor
 extern mqd_t light_ipc_queue;
+extern mqd_t log_queue;
 
 extern struct mq_attr ipc_attr;
 struct mq_attr temp_ipc_attr;
@@ -73,7 +74,7 @@ typedef struct ipcmessage {
 
 void ipc_queue_init();
 void shuffler_king();
-
+void log_queue_init();
 void temp_ipc_queue_init();
 
 void shuffler_mini_temp();
@@ -84,6 +85,6 @@ void shuffler_mini_light();
 
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg);
 void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct);
-void print_ipc_msg(ipcmessage_t msg);
+void manage_ipc_msg(ipcmessage_t msg, int log_en, char* log_str);
 
 #endif /* __ipc_messq_h_*/
