@@ -39,7 +39,7 @@ void shuffler_king()      //main Q, receives messages from all Q's
       case(IPC_LIGHT):
         mq_send(light_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
         //print_ipc_msg(ipc_msg);
-        printf("light case*****************\n");
+        //printf("light case*****************\n");
         break;
       case(IPC_NONE):
       default:
@@ -242,13 +242,13 @@ void manage_ipc_msg(ipcmessage_t msg, int log_en, char* log_str)
       if(msg.source == IPC_LIGHT)
       {
         //printf("Light sensor reads: %s lumens.\n", msg.payload);
-        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, "Light sensor reads: ", msg.payload, " lumens");
+        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, "Light sensor reads: ", msg.payload, " lux");
     
       }
       else if(msg.source == IPC_TEMP)
       {
       //  printf("Temp sensor reads: %s degF.\n", msg.payload);
-        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, "Temp sensor reads: ", msg.payload, " degF");
+        sprintf(tmp, "%s%s%s.\n", msg.timestamp, "Temp sensor reads: ", msg.payload);
       } // we need to be able to switch between degree units, maybe another ipcmessage_t element for units?
       break;
     case(INFO):    

@@ -16,11 +16,12 @@ int temp_addr = 0x48;       //slave address for the temp sensor
 //char readinfo[2] = {0};    //array for reading and sending data to sensor
 char writeinfo[2] = {0};
 char * tempsense_path = "/dev/i2c-2";
+temp_unit_t temp_unit_sel;
 
 void *temp_ops()
 {
  // printf("entering temp_ops\n");
-
+  temp_unit_sel = UNITS_F;
   signal(SIGUSR1, temp_ops_exit);    //signal handler for temp_ops function
   tempsensor = i2c_init(tempsense_path, temp_addr);
   unsigned long long int delay_time = 500000000;  //in nanoseconds
@@ -52,7 +53,7 @@ void handler_timer(union sigval arg)
   ipcmessage_t temp;     //decipered string into ipcmessage_t
   ipcmessage_t ipc_msg;  
 
-  r_temp_reg(tempsensor,readbuf);
+  r_temp_reg(tempsensor, readbuf);
   //display_c(readbuf);
   //display_f(readbuf);
   //display_k(readbuf);
@@ -63,10 +64,26 @@ void handler_timer(union sigval arg)
   ipc_msg.destination = IPC_LOG;
   ipc_msg.src_pid = getpid();
 
-  sprintf(ipc_msg.payload, "%f", display_f(readbuf));
+  switch(temp_unit_sel)
+  {
+    case UNITS_C:
+      sprintf(ipc_msg.payload, "%f degC", display_c(readbuf));
+      break;
+    case UNITS_F:
+      sprintf(ipc_msg.payload, "%f degF", display_f(readbuf));
+      break;
+    case UNITS_K:
+      sprintf(ipc_msg.payload, "%f degK", display_k(readbuf));
+      break;
+    case UNITS_NONE:
+    default:
+      sprintf(ipc_msg.payload, "err");
+      break;
+  }
+  
   build_ipc_msg(ipc_msg, msg_str);
  // decipher_ipc_msg(msg_str, &temp);
-  mq_send(ipc_queue,msg_str,strlen(msg_str),0);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
 }
 
 void metric_counter_init(unsigned long long int firedelay)
