@@ -8,16 +8,16 @@
 #include "ipc_messq.h"
 
 void shuffler_king()
-{ 
+{
+
   char ipc_queue_buff[IPC_ELEMENT_SIZE];
-  ipcmessage_t * main_message = (ipcmessage_t*)malloc(sizeof(ipcmessage_t));
 
   mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
   printf("Main Q read message: %s\n", ipc_queue_buff);
-  
-  //change this to ipcmessage struct member destination
-  int destination = 2;
-  
+
+    //change this to ipcmessage struct member destination
+    int destination = 2;
+
   switch(destination){
     case(1):
       mq_send(temp_ipc_queue,"message sent from main to temp\0",31, 0);
@@ -30,8 +30,8 @@ void shuffler_king()
       break;
     default:
       printf("Destination not valid\n");
-  }
-  free(main_message);
+    }
+
 }
 
 void shuffler_mini_temp()
@@ -42,7 +42,7 @@ void shuffler_mini_temp()
     {
       printf("mq_notify error: %s\n", strerror(errno));
     }
-  
+
   mq_getattr(temp_ipc_queue, &temp_ipc_attr);
   while(temp_ipc_attr.mq_curmsgs > 0)
     {
@@ -56,7 +56,8 @@ void shuffler_mini_temp()
 void ipc_queue_init()
 {
   //struct mq_attr ipc_attr;
-  
+  //struct sigevent ipc_notify;       //when mq_notify for main triggers, function is called
+
   ipc_attr.mq_maxmsg = 255;
   ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
   ipc_attr.mq_flags = 0;
@@ -126,4 +127,77 @@ void shuffler_mini_light()
       printf("Light Q read message: %s\n",light_ipc_queue_buff);
       sleep(1);
     }
+  
+void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
+{
+  char tmp[256];
+//  printf("a\n");
+  strcpy(ipc_msg, msg_struct.timestamp);
+  strcat(ipc_msg, "\n");
+//  printf("b\n");
+  sprintf(tmp, "%d", msg_struct.type);
+  strcat(ipc_msg, tmp);
+  strcat(ipc_msg, "\n");
+//  printf("c\n");
+  sprintf(tmp, "%d", msg_struct.source);
+  strcat(ipc_msg, tmp);
+  strcat(ipc_msg, "\n");
+//  printf("d\n");
+  sprintf(tmp, "%d", (int)msg_struct.src_pid);
+  strcat(ipc_msg, tmp);
+  strcat(ipc_msg, "\n");
+//  printf("e\n");
+  sprintf(tmp, "%d", msg_struct.destination);
+  strcat(ipc_msg, tmp);
+  strcat(ipc_msg, "\n");
+  //printf("f\n");
+  strcat(ipc_msg, msg_struct.payload);
+  strcat(ipc_msg, "\0"); // mq_ queues need a null character appended (may not be necessary because of strcat)
+}
+
+void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
+{
+  int i=0;
+  int j=0;
+  char tmp1[1];
+  char tmp2[16];
+  // timestamp
+  for(i=0, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
+  {
+    msg_struct->timestamp[j] = ipc_msg[i];
+  }
+
+  // message type
+  for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
+  {
+    tmp1[j] = ipc_msg[i];
+  }
+  msg_struct->type = (message_t)atoi(tmp1);
+
+  // source process
+  for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
+  {
+    tmp1[j] = ipc_msg[i];
+  }
+  msg_struct->source = (location_t)atoi(tmp1);
+
+  // source PID
+  for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
+  {
+    tmp2[j] = ipc_msg[i];
+  }
+  msg_struct->src_pid = (pid_t)atoi(tmp2);
+
+  // destination process
+  for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
+  {
+    tmp1[j] = ipc_msg[i];
+  }
+  msg_struct->destination = (location_t)atoi(tmp1);
+
+  // message payload (terminated by null char)
+  for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
+  {
+    msg_struct->payload[j] = ipc_msg[i];
+  }
 }

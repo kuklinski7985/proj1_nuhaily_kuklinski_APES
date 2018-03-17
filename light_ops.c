@@ -8,6 +8,17 @@
 #include "light_ops.h"
 #include "ipc_messq.h"
 
+/*
+typedef struct ipcmessage{
+  char timestamp[10];
+  message_t type;                   //message identifier
+  location_t source;                //where message originates from
+  pid_t src_pid;                    //pid of process creating the message
+  location_t destination;           //final destination for message
+  char* message;               //data being requested from sensors
+} ipcmessage_t;
+*/
+
 int bizzounce;
 
 int lightsensor;          //used for return value for open(), file indicator
@@ -24,12 +35,13 @@ void *light_ops()
   signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
   lightsensor = i2c_init(i2c_path, light_addr);
 
-  if(light_power_test() == 2)
-  {
+  if(light_power_test() == 2) // transfer all this to a message that gets sent to main
+  { // do not do printf here or anywhere outside of main (in final version)
     printf("Light sensor initialized. ID = 0x");
     light_r_id_reg(lightsensor, readbuf);
     printf("%x\n", readbuf[0]);
   }
+  // need a queue to receive and process commands from main
 
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   light_counter_init(delay_time);
@@ -51,14 +63,35 @@ void light_ops_exit(int signum)
 void light_timer_handler(union sigval arg)
 {
   char readbuf[2];
+  char msg_str[256];
+  char temp_str[256];
+  ipcmessage_t temp;
   int ch0;
   int ch1;
+  ipcmessage_t ipc_msg;
   light_r_adc(lightsensor, 0, readbuf);
   ch0 = (int)readbuf[1] << 8 | (int)readbuf[0];
   light_r_adc(lightsensor, 1, readbuf);
   ch1 = (int)readbuf[1] << 8 | (int)readbuf[0];
-  printf("Lux: %f\n", counts_to_lux(ch0, ch1));
-  light_w_timing_reg(lightsensor, GAIN_HIGH, INTEG_101MS, readbuf);
+//  printf("Lux: %f\n", counts_to_lux(ch0, ch1));
+//  light_w_timing_reg(lightsensor, GAIN_HIGH, INTEG_101MS, readbuf);
+//printf("1\n");
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+//printf("1.5\n");
+  ipc_msg.type = LIGHT;
+  ipc_msg.source = IPC_LIGHT;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid(); // pid_t
+printf("counts to lux: %f\n", counts_to_lux(ch0, ch1));
+  sprintf(ipc_msg.payload, "%f", counts_to_lux(ch0, ch1));
+//  printf("temp_str: %s\n", temp_str);
+//printf("3\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  printf("IPC string:\n%s\n", msg_str);
+//printf("4\n");
+  decipher_ipc_msg(msg_str, &temp);
+  printf("deciphered components:\nTimestamp: %s\ntype: %d\nsource: %d\nsrc_pid: %d\ndestination: %d\npayload: %s\n", temp.timestamp, (message_t)temp.type, (location_t)temp.source, (int)temp.src_pid, (location_t)temp.destination, temp.payload);
+  // now place on ipc queue, main can display and translate to log_type_t
 }
 
 void light_counter_init(unsigned long long int firedelay)
