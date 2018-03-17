@@ -18,6 +18,8 @@ char writeinfo[2] = {0};
 char * tempsense_path = "/dev/i2c-2";
 temp_unit_t temp_unit_sel;
 
+float temp_previous;
+
 void *temp_ops()
 {
  // printf("entering temp_ops\n");
