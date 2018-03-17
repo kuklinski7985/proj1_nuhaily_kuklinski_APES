@@ -52,16 +52,13 @@ typedef struct
   int int_data;
   char data_units[LOG_ELEMENT_SIZE]; // doesn't need to be this big
   log_type_t msg_type;
-
 } log_struct_t;
 
-
-
-
 void* logger();
-static void queueHasData();
+static void logger_handler();
 void log_exit();
-void writeLogStr(file_t* logfile, log_struct_t logitem);
+void writeLogStruct(file_t* logfile, log_struct_t logitem);
+void writeLogStr(file_t* logfile, char* log_str);
 char* getCurrentTimeStr();
 int8_t thread_sprintf(char* rtn_ascii, long lng, char format[]);
 

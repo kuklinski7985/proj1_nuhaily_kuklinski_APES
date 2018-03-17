@@ -20,7 +20,7 @@ char * tempsense_path = "/dev/i2c-2";
 
 void *temp_ops()
 {
-  printf("entering temp_ops\n");
+ // printf("entering temp_ops\n");
 
   signal(SIGUSR1, temp_ops_exit);    //signal handler for temp_ops function
   tempsensor = i2c_init(tempsense_path, temp_addr);
@@ -28,7 +28,7 @@ void *temp_ops()
   metric_counter_init(delay_time);
   while(bizzounce == 0)
     {
-      mq_send(ipc_queue,"message from temp to main\0",26, 0);
+    //  mq_send(ipc_queue,"message from temp to main\0",26, 0);
       usleep(500000);   //500000 sends every half a second
     }
 

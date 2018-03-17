@@ -28,6 +28,7 @@ int main()
   char ipc_queue_buff[128];
   
   ipc_queue_init();           //main queue created
+  log_queue_init();
   temp_ipc_queue_init();      //temp sensor queue created
   light_ipc_queue_init();     //light sensor queue created
 
@@ -66,10 +67,10 @@ int main()
   }
 
 
-  printf("Bizzounce before entering while loop: %d\n", bizzounce);
+  //printf("Bizzounce before entering while loop: %d\n", bizzounce);
   /******only needed for seeding the main queue******/
 
-  mq_send(ipc_queue, "Seeding Message\0",16, 0);
+ // mq_send(ipc_queue, "Seeding Message\0",16, 0);
   mq_getattr(ipc_queue, &ipc_attr);
   while(bizzounce == 0)
   {
@@ -77,13 +78,13 @@ int main()
 
     while(ipc_attr.mq_curmsgs > 0)
       {
-
+       // printf("calling shuffler_king\n");
 	      shuffler_king();
 	      mq_getattr(ipc_queue, &ipc_attr);
-	  //    printf("remaining on queue: %ld\n\n",ipc_attr.mq_curmsgs);
+	  //  printf("remaining on queue: %ld\n\n",ipc_attr.mq_curmsgs);
         //printf("counter: %d\n",counter);
         
-	      usleep(2000);
+	   //   usleep(2000);
       //mq_send(ipc_queue, "while testing outside\0", 128, 0);
 
       }
