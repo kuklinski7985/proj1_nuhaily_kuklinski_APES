@@ -29,29 +29,10 @@ void* logger()
   ipcmessage_t ipc_msg;
   char msg_str[256];
   
-  //printf("***Entering log queue***\n***************\n");
-  // Temporary manual set of logfile name
-  strcpy(logfile.filename, "prj.log");
+ // strcpy(logfile.filename, "prj.log");
 
-  fileCreate(&logfile);
-  //printf("Start of program: log queue uninitialized: %d.\n", log_queue);
+ // fileCreate(&logfile);
 
-  //printf("logger thread: log queue initialized: %d.\n", log_queue);
-  //printf("create log mqueue error: %s\n", strerror(errno));
-
- /* qnotify.sigev_notify = SIGEV_THREAD;
-  qnotify.sigev_notify_function = logger_handler;
-  qnotify.sigev_notify_attributes = NULL;
-  qnotify.sigev_value.sival_ptr = NULL;*/
-  //mq_notify(log_queue, &qnotify);
-
-  //  printf("mq_notify error: %s\n", strerror(errno));
- // printf("Trying to push to queue from logger thread...\n");
-  //mq_send(log_queue, "9\0", 2, 0);
-  //printf("logger mq_send: %s\n", strerror(errno));
-
-  //signal(SIGUSR1, log_exit);    //signal handler for log_ops function
-  
   while(bizzounce == 0)
   {
     mq_getattr(log_queue, &log_attr);  //keeps the thread alive to process signals and timer requests

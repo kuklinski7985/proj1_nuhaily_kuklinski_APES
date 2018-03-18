@@ -69,6 +69,6 @@ int i2c_init(char * filepath, int addr)
       return -1;
     }
 
-  printf("I2C init complete.\n");
+ // printf("I2C init complete.\n");
   return i2ctarget;
 }

@@ -32,7 +32,7 @@ int light_hb_err;
 int log_hb_count;
 int log_hb_err;
 
-int main()
+int main(int argc, char* argv[])
 {
   char ipc_queue_buff[256];
   
@@ -45,6 +45,7 @@ int main()
   input_struct * input1;           //input for pthread,couldnt get to work w/o
   char msg_str[256];
   char buf1[255];
+  char log_filename[256];
   ipcmessage_t ipc_msg;
  // remote_socket_server_init();
 
@@ -89,8 +90,24 @@ int main()
   build_ipc_msg(ipc_msg, msg_str);
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
   memset(msg_str, 0, strlen(msg_str));
+  
+  if(argc > 1)
+  {
+    strcpy(log_filename, argv[1]);
+  }
+  else
+  {
+    strcpy(log_filename, "prj.log");
+  }
+  
+  strcpy(logfile.filename, log_filename);
 
- // mq_send(ipc_queue, "Seeding Message\0",16, 0);
+  if(fileCreate(&logfile) == -1)
+  {
+    printf("Error creating logfile.\n");
+    bizzounce = 1;
+  }
+ 
   mq_getattr(ipc_queue, &ipc_attr);
   while(bizzounce == 0)
   {
@@ -99,7 +116,7 @@ int main()
 	    shuffler_king();
 	    mq_getattr(ipc_queue, &ipc_attr);
     }
-    if(temp_hb_err > 0)
+    if(temp_hb_err > 0 || light_hb_err > 0 || log_hb_err > 0)
     {
         memset(msg_str, 0, strlen(msg_str));
         strcpy(ipc_msg.timestamp, getCurrentTimeStr());
@@ -107,7 +124,20 @@ int main()
         ipc_msg.source = IPC_MAIN;
         ipc_msg.destination = IPC_LOG;
         ipc_msg.src_pid = getpid();
-        strcpy(ipc_msg.payload, "Temperature thread timed out.\n");
+        strcpy(ipc_msg.payload, "");
+        if(temp_hb_err > 0)
+        {
+          strcat(ipc_msg.payload, "Temperature sensor thread timed out.");
+        }
+        if(light_hb_err > 0)
+        {
+          strcat(ipc_msg.payload, "Light sensor thread timed out.");
+        }
+        if(log_hb_err > 0)
+        {
+          strcat(ipc_msg.payload, "Log thread timed out.");
+        }
+        strcat(ipc_msg.payload, "\n");
         build_ipc_msg(ipc_msg, msg_str);
         mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
         memset(msg_str, 0, strlen(msg_str));
