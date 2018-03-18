@@ -1,6 +1,6 @@
 /**
 * @file main.h
-* @brief main fxn for project1 - APES
+* @brief main fxn for project1 - APES, globals
 * @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/

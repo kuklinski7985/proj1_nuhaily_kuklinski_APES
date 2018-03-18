@@ -7,18 +7,18 @@
 
 #include "main.h"
 
-pthread_t tempops_thread;    //creates new pthread
-pthread_t lightops_thread;    //creates new pthread
-pthread_t log_thread;
-pthread_t socket_thread;
-pthread_t hb_thread;
+pthread_t tempops_thread;    //creates new pthread for the temperature sensor
+pthread_t lightops_thread;    //creates new pthread for the light sensor
+pthread_t log_thread;         //new thread for logger
+pthread_t socket_thread;      //thread for the remote socket
+pthread_t hb_thread;          //heartbeat sensor thread
 
 pthread_attr_t attr;         //standard attributes for pthread
-file_t logfile;
+file_t logfile;             
 file_t ipcfile;
 file_t tempipcfile;
 
-int bizzounce;
+int bizzounce;              //global variable to exit all threads and close
 mqd_t log_queue;           //queue associated with logger
 mqd_t ipc_queue;           //queue associated with main thread
 mqd_t temp_ipc_queue;      //queue associated with temp sensor
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   char ipc_queue_buff[DEFAULT_BUF_SIZE];
   
   ipc_queue_init();           //main queue created
-  log_queue_init();
+  log_queue_init();          //starts the queue fo the logger
   temp_ipc_queue_init();      //temp sensor queue created
   light_ipc_queue_init();     //light sensor queue created
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   build_ipc_msg(ipc_msg, msg_str);
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
   memset(msg_str, 0, strlen(msg_str));
-  
+  /****using argc to give file name for logger at run time****/
   if(argc > 1)
   {
     strcpy(log_filename, argv[1]);
@@ -116,6 +116,9 @@ int main(int argc, char* argv[])
     bizzounce = 1;
   }
  
+
+ /******monitors the main message queue for new messages and distributes accordingly******/
+ /******also provides the system heartbeat for the sensors*******/
   mq_getattr(ipc_queue, &ipc_attr);
   while(bizzounce == 0)
   {
@@ -153,6 +156,7 @@ int main(int argc, char* argv[])
     mq_getattr(ipc_queue, &ipc_attr);
   }
 
+/***joining threads, closing files, and removing queues*****/
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = INFO;
   ipc_msg.source = IPC_TEMP;
@@ -185,14 +189,14 @@ int main(int argc, char* argv[])
   
   pthread_join(hb_thread, NULL);
 
-  /*pthread_join(log_thread, NULL);
+  pthread_join(log_thread, NULL);
   mq_close(log_queue);
   printf("mq_close err: %s\n", strerror(errno));
 
-  pthread_join(log_thread, NULL);*/
+  pthread_join(log_thread, NULL);
 
 }
-
+//definition for heartbeat
 void* heartbeat()
 {
   char msg_str[DEFAULT_BUF_SIZE];

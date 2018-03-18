@@ -23,13 +23,47 @@
 #include "i2c_wrapper.h"
 #include "tempsense.h"
 
+/**
+ *@brief enum for choosing the temp units
+ */
 typedef enum {
     UNITS_NONE, UNITS_F, UNITS_C, UNITS_K
 } temp_unit_t;
 
+/**
+ *@brief function called when thread is created
+ *
+ *@param "VOID" nothing
+ *
+ *@return VOID
+ */
 void *temp_ops();
+
+/**
+ *@brief exit function for thread when joined
+ *
+ *@param "VOID" nothing
+ *
+ *@return VOID
+ */
 void temp_ops_exit(int signum);
+
+/**
+ *@brief verifies the temp sensor is alive, returns data, and ready to go
+ *
+ *@param "VOID" nothing
+ *
+ *@return VOID
+ */
 int temp_power_test();
+
+/**
+ *@brief counter for the temp sensor to transmit data to the logger at specific intervals
+ *
+ *@param "VOID" nothing
+ *
+ *@return VOID
+ */
 void metric_counter_init(unsigned long long int firedelay);
 
 //void temp_hb(union sigval arg);

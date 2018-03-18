@@ -30,7 +30,7 @@
 #define remote_socket_server_h_
 
 /**
- *@brief initializes remote socket and keeps it open for data transfers
+ *@brief initializes remote socket and keeps it open for data transfers, created in a thread and kept open until bizzounce
  *
  *@param "VOID" nothing
  *

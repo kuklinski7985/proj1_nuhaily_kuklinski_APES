@@ -1,6 +1,6 @@
 /**
 * @file remote_socket_server.c
-* @brief fxn definitions to create a remote socket which can access temp and light data
+* @brief fxn definitions to create a remote socket which can access temp and light data, server side
 * @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/

@@ -16,13 +16,13 @@ int tempsensor;          //used for return value for open(), file indicator
 int temp_addr = 0x48;       //slave address for the temp sensor
 //char readinfo[2] = {0};    //array for reading and sending data to sensor
 char writeinfo[2] = {0};
-char * tempsense_path = "/dev/i2c-2";
+char * tempsense_path = "/dev/i2c-2";    //file location for i2c interface
 temp_unit_t temp_unit_sel;
 
 char * temp_previous;
 
-extern int temp_hb_count;
-extern int temp_hb_err;
+extern int temp_hb_count;   //heartbeat
+extern int temp_hb_err;     //heartbeat
 
 void *temp_ops()
 {
@@ -155,6 +155,7 @@ void metric_counter_init(unsigned long long int firedelay)
   struct sigevent timer_actions;
   int timer_status;
 
+  //sigevent for timer expiration
   timer_actions.sigev_notify = SIGEV_THREAD;
   timer_actions.sigev_value.sival_ptr = &timer;
   timer_actions.sigev_notify_function = handler_timer;

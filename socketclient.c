@@ -1,5 +1,10 @@
+/**
+* @file socketclient.c
+* @brief fxn external program that creates a socket in order to obtain sensor information, client side
+* @author Andrew Kuklinski and Adam Nuhaily
+* @date 03/11/2018
+**/
 
-//client to request data from the sensors
 
 #include <stdio.h>
 #include <unistd.h>

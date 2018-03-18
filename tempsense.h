@@ -29,32 +29,124 @@
 #define PTRREG_R1R0_MASK(X) (x<<6)
 #define PTRREG_OS_MASK      0x80
 
+/**
+ *@brief enum for register configuration
+ *
+ *@param "VOID"
+ *
+ *@return VOID
+ */
 typedef enum{
   TEMP_REG, CONFIG_REG, TLOW_REG, THIGH_REG
 }ptr_reg;
 
-void w_ptr_reg(int fd, ptr_reg ptrreg);  //complete
+/**
+ *@brief writes to pointer register
+ *
+ *@param file pointer and which register you want to access
+ *
+ *@return VOID
+ */
+void w_ptr_reg(int fd, ptr_reg ptrreg);
 
+/**
+ *@brief read from Tlow register
+ *
+ *@param file pointer and location to store information
+ *
+ *@return VOID
+ */
 void r_tlow_reg(int fd, char * buff);  //complete
 
-void w_tlow_reg(int fd, char * buff);  //complete
+/**
+ *@brief write to Tlow register
+ *
+ *@param file pointer and location of infromation to send
+ *
+ *@return VOID
+ */
+void w_tlow_reg(int fd, char * buff);  
 
-void r_thigh_reg(int fd, char * buff);  //complete
+/**
+ *@brief read from Thigh register
+ *
+ *@param file pointer and location to store information
+ *
+ *@return VOID
+ */
+void r_thigh_reg(int fd, char * buff);
 
-void w_thigh_reg(int fd, char * buff);  //complete
+/**
+ *@brief write to Thighregister
+ *
+ *@param file pointer and location of infromation to send
+ *
+ *@return VOID
+ */
+void w_thigh_reg(int fd, char * buff);  
 
-void r_temp_reg(int fd, char * buff);  //complete
+/**
+ *@brief read temp data register
+ *
+ *@param file pointer and location to store the data
+ *
+ *@return VOID
+ */
+void r_temp_reg(int fd, char * buff);  
 
-void w_config_reg(int fd, char * buff);  //complete
+/**
+ *@brief write to configuration register
+ *
+ *@param file pointer and location to store the data
+ *
+ *@return VOID
+ */
 
-int r_config_reg(int fd);  //complete
+void w_config_reg(int fd, char * buff); 
 
-float display_c(char * buff);  //complete
+/**
+ *@brief read the values of the configuration register
+ *
+ *@param file pointer
+ *
+ *@return VOID
+ */
+int r_config_reg(int fd);  
 
-float display_f(char * buff);  //complete
+/**
+ *@brief makes raw data from sensor into readable format, in celcius
+ *
+ *@param location to store the data
+ *
+ *@return VOID
+ */
+float display_c(char * buff); 
 
-float display_k(char * buff);  //complete
+/**
+ *@brief makes raw data from sensor into readable format, in fahrenheit
+ *
+ *@param location to store the data
+ *
+ *@return VOID
+ */
+float display_f(char * buff);  
 
+/**
+ *@brief makes raw data from sensor into readable format, in kelvin
+ *
+ *@param location to store the data
+ *
+ *@return VOID
+ */
+float display_k(char * buff); 
+
+/**
+ *@brief makes the temp sensor able to read negitive numbers
+ *
+ *@param location to store the data
+ *
+ *@return VOID
+ */
 int detect_twos(int in);
 
 uint16_t convert_twos(uint16_t in);
