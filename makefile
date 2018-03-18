@@ -52,15 +52,12 @@ build: $(OBJS)
 	$(CC) $(DEBUG) $(OBJS) $(LDFLAGS) -o project1.elf -lrt
 	size project1.elf $(OBJS)
 
-<<<<<<< 42dc8de33346c3c0edd24b42b72fe2b7463a1abc
 .PHONY: buildc
 buildc: $(OBJS_SOCK)
 	$(CC) $(DEBUG) $(OBJS_SOCK) $(LDFLAGS) $(INCLUDES) -o client.elf -lrt
 	size client.elf $(OBJS_SOCK)
 
 
-=======
->>>>>>> Attempt at unit tests
 .PHONY: clean
 clean:
 	-rm *.i *.o *.map *.d project1.elf a.out
