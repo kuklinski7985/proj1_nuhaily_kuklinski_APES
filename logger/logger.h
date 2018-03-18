@@ -1,11 +1,12 @@
 /**
  *  @file logger.h
- *  @author Adam Nuhaily
+ *  @author Adam Nuhaily and Andrew Kuklinski
  *  @date 11 Mar 2018
  *  @brief hw3 header file
  *  This source file implements the multithreaded program described in the
  *  homework 3 assignment document.
  */
+
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
@@ -49,6 +50,5 @@ void log_exit();
 void writeLogStr(file_t* logfile, char* log_str);
 char* getCurrentTimeStr();
 int8_t thread_sprintf(char* rtn_ascii, long lng, char format[]);
-
 
 #endif

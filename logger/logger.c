@@ -1,12 +1,17 @@
-
+/**
+ * @brief Logger thread and file & system I/O functions
+ * 
+ * @file logger.c
+ * @author Adam Nuhaily and Andrew Kuklinski
+ * @date 2018-03-17
+ */
 #include "logger.h"
 
 pthread_mutex_t log_mutex;
 pthread_mutex_t time_mutex;
 pthread_mutex_t sprintf_mutex;
 
-
-extern int bizzounce;
+extern int bizzounce;   // Exit signal
 extern mqd_t log_queue;
 extern mqd_t ipc_queue;
 
@@ -15,30 +20,28 @@ extern file_t logfile;
 extern int log_hb_count;
 extern int log_hb_err;
 
-//TODO set up shared memory to indicate when logger queue is initialized so that other
-// threads don't try to write to it before it's ready
-
+/**
+ * @brief Logger thread handler function
+ * 
+ * @return void* 
+ */
 void* logger()
 {
   // initialize log queue
   struct mq_attr log_attr;
- // struct sigevent qnotify;
+
   char queue_buf[DEFAULT_BUF_SIZE];
- // char* queue_buf = (char)malloc(sizeof(char)*DEFAULT_BUF_SIZE);
   unsigned int prio;
   ipcmessage_t ipc_msg;
   char msg_str[DEFAULT_BUF_SIZE];
-  
- // strcpy(logfile.filename, "prj.log");
-
- // fileCreate(&logfile);
 
   while(bizzounce == 0)
   {
     mq_getattr(log_queue, &log_attr);  //keeps the thread alive to process signals and timer requests
     while(log_attr.mq_curmsgs > 0)
     {
-     // printf("1\n");
+      // Loop and inspect log queue for new items to pull
+      // When present, pull and insert into logfile
       mq_receive(log_queue, queue_buf, DEFAULT_BUF_SIZE, &prio);
       writeLogStr(&logfile, queue_buf);
       mq_getattr(log_queue, &log_attr);
@@ -47,10 +50,15 @@ void* logger()
     log_hb_count = 0;
     log_hb_err = 0;
   }
-  // close file
+  
+  // Desire to exit, close logffile
   fileClose(&logfile);
 }
 
+/**
+ * @brief Intended to be a sigevent handler for mq_notify, no longer used
+ * 
+ */
 static void logger_handler()
 {
   char queue_buf[DEFAULT_BUF_SIZE];
@@ -59,21 +67,27 @@ static void logger_handler()
   // open file
   // read from queue
   mq_receive(log_queue, queue_buf, DEFAULT_BUF_SIZE, &prio);
- // printf("**log queue received data**\n");
 
-  //printf("Data received: %s\n", queue_buf);
   // add to file
   writeLogStr(&logfile, queue_buf);
 
-  // close file ?
-
 }
 
+/**
+ * @brief Handler function to exit log thread gracefully
+ * 
+ */
 void log_exit()
 {
   printf("exit signal received : log thread!\n\n");
 }
 
+/**
+ * @brief Write log_str to logfile, thread-safe
+ * 
+ * @param logfile 
+ * @param log_str 
+ */
 void writeLogStr(file_t* logfile, char* log_str)
 {
   pthread_mutex_lock(&log_mutex);
@@ -132,4 +146,3 @@ int8_t thread_sprintf(char* rtn_ascii, long lng, char format[])
   pthread_mutex_unlock(&sprintf_mutex);
   return 0;
 }
-

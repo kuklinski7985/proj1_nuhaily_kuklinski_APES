@@ -16,40 +16,40 @@ extern int log_hb_err;
 extern int hb_hb_count;
 extern int hb_hb_err;
 
-void shuffler_king()      //main Q, receives messages from all Q's
+/**
+ * @brief Parse and process messages pulled from main IPC queue
+ * 
+ */
+void shuffler_king()
 { 
 
   char ipc_queue_buff[DEFAULT_BUF_SIZE];
   char log_str[DEFAULT_BUF_SIZE];
   ipcmessage_t ipc_msg;
 
+  // Pull item
   mq_receive(ipc_queue, ipc_queue_buff, DEFAULT_BUF_SIZE, NULL);
   decipher_ipc_msg(ipc_queue_buff, &ipc_msg);
 
-  //printf("Main Q read message: %s | %s | %d\n", testing.payload, testing.timestamp, testing.destination);
-  //printf("destination: %d\n", ipc_msg.destination);
-
+  // Determine where item wants to go and process accordingly
   switch(ipc_msg.destination) 
   {
-      case(IPC_MAIN):
-        if(ipc_msg.type == HEARTBEAT)
+      case(IPC_MAIN): // Items destined for main only, probably just display
+        if(ipc_msg.type == HEARTBEAT) // no longer in use
         {
           switch(ipc_msg.source)
           {
             case(IPC_TEMP):
               temp_hb_count = 0;
               temp_hb_err = 0;
-             // printf("reset temp hb counter.\n");
               break;
             case(IPC_LIGHT):
               light_hb_count = 0;
               light_hb_err = 0;
-             // printf("reset temp hb counter.\n");
               break;
             case(IPC_LOG):
               log_hb_count = 0;
               log_hb_err = 0;
-            //  printf("reset temp hb counter.\n");
               break;              
             default:
               break;
@@ -57,32 +57,38 @@ void shuffler_king()      //main Q, receives messages from all Q's
         }
         break;
 
-       case(IPC_LOG):
-        //print_ipc_msg(ipc_msg);
+        // Items to be pushed to log queue. Display to terminal and send to log
+      case(IPC_LOG):
         manage_ipc_msg(ipc_msg, log_str);
         mq_send(log_queue, log_str, strlen(log_str), 0);
         break;
 
+      // General user-use items
       case(IPC_USER):
         mq_send(log_queue, log_str, strlen(log_str), 0);
         break;
 
+      // Items to be sent to temperature sensor task
       case(IPC_TEMP):
         mq_send(temp_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
         break;
 
+      // Items to be sent to light sensor task
       case(IPC_LIGHT):
         mq_send(light_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
-        //print_ipc_msg(ipc_msg);
-        //printf("light case*****************\n");
         break;
       
+      // Type-less or erroneous items
       case(IPC_NONE):
       default:
         printf("Destination %d not valid\n", ipc_msg.destination);
   }
 }
 
+/**
+ * @brief Previously intended to be temperature sensor-specific, now not used
+ * 
+ */
 void shuffler_mini_temp()
 {
   char temp_ipc_queue_buff[DEFAULT_BUF_SIZE];
@@ -102,6 +108,10 @@ void shuffler_mini_temp()
     }
 }
 
+/**
+ * @brief Initialize IPC queue. Requires mount of appropriate mqueue folder
+ * 
+ */
 void ipc_queue_init()
 {
   ipc_attr.mq_maxmsg = 255;
@@ -113,6 +123,10 @@ void ipc_queue_init()
 
 }
 
+/**
+ * @brief Initialize log queue. Requires mount of appropriate mqueue folder
+ * 
+ */
 void log_queue_init()
 {
   struct mq_attr log_attr;
@@ -124,10 +138,12 @@ void log_queue_init()
   //printf("Log queue init status: %s\n", strerror(errno));
 }
 
+/**
+ * @brief Initialize temp sensor queue. Requires mount of mqueue folder.
+ * 
+ */
 void temp_ipc_queue_init()
 {
-  //struct mq_attr temp_ipc_attr;
-
   temp_ipc_attr.mq_maxmsg = 255;
   temp_ipc_attr.mq_msgsize = sizeof(char)*DEFAULT_BUF_SIZE;
   temp_ipc_attr.mq_flags = 0;
@@ -139,12 +155,16 @@ void temp_ipc_queue_init()
   sigevent_temp_ipc_notify.sigev_notify_attributes = NULL;
   sigevent_temp_ipc_notify.sigev_value.sival_ptr = NULL;
   if (mq_notify(temp_ipc_queue, &sigevent_temp_ipc_notify) == -1)
-    {
-      printf("mq_notify error: %s\n", strerror(errno));
-    }
+  {
+    printf("mq_notify error: %s\n", strerror(errno));
+  }
   
 }
 
+/**
+ * @brief Initialize light sensor queue. Requires mount of mqueue folder.
+ * 
+ */
 void light_ipc_queue_init()
 {
   //struct mq_attr light_ipc_attr;
@@ -166,6 +186,10 @@ void light_ipc_queue_init()
   
 }
 
+/**
+ * @brief Previously intended to be light sensor specific handler. Not used.
+ * 
+ */
 void shuffler_mini_light()
 {
   char light_ipc_queue_buff[DEFAULT_BUF_SIZE];
@@ -187,27 +211,35 @@ void shuffler_mini_light()
     }
 }
 
+/**
+ * @brief Translate from ipc message struct type to string for queue transmit
+ * 
+ * @param ipc_msg 
+ * @param msg_struct 
+ * Messages are formatted with \n separating each field (delimiters).
+ */
 void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
 {
   int i=0;
   int j=0;
   char tmp1[1];
   char tmp2[16];
- // printf("aa\n");
-  // timestamp
+
+  // extract timestamp
   for(i=0, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
   {
     msg_struct->timestamp[j] = ipc_msg[i];
   }
   msg_struct->timestamp[j] = '\0';
-  // message type
+  
+  // determine message type
   for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
   {
     tmp1[j] = ipc_msg[i];
   }
   msg_struct->type = (message_t)atoi(tmp1);
 
-  // source process
+  // determine source process
   for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
   {
     tmp1[j] = ipc_msg[i];
@@ -227,44 +259,56 @@ void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
     tmp1[j] = ipc_msg[i];
   }
   msg_struct->destination = (location_t)atoi(tmp1);
-//printf("gg\n");
+
   // message payload (terminated by null char)
   for(i++, j=0; ipc_msg[i] != '\n' && ipc_msg[i] != '\0'; i++, j++)
   {
     msg_struct->payload[j] = ipc_msg[i];
   }
-  msg_struct->payload[j] = '\0';
-//  printf("rr\n");
- // printf("payload: %s\n", msg_struct->payload);
+  msg_struct->payload[j] = '\0';  // mqueue seems to require a null terminator
+                                  // as the receive function doesn't append one
+
 }
 
+/**
+ * @brief Translate from string to ipc message type for parsing and processing
+ * 
+ * @param msg_struct 
+ * @param ipc_msg 
+ */
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
 {
   char tmp[DEFAULT_BUF_SIZE];
-//  printf("a\n");
+
   strcpy(ipc_msg, msg_struct.timestamp);
   strcat(ipc_msg, "\n");
-//  printf("b\n");
+
   sprintf(tmp, "%d", msg_struct.type);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
-//  printf("c\n");
+
   sprintf(tmp, "%d", msg_struct.source);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
-//  printf("d\n");
+
   sprintf(tmp, "%d", (int)msg_struct.src_pid);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
-//  printf("e\n");
+
   sprintf(tmp, "%d", msg_struct.destination);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
-//  printf("f\n");
+
   strcat(ipc_msg, msg_struct.payload);
   strcat(ipc_msg, "\n");
 }
 
+/**
+ * @brief Determine appropriate formatting for IPC message depending on type
+ * 
+ * @param msg 
+ * @param log_str 
+ */
 void manage_ipc_msg(ipcmessage_t msg, char* log_str)
 {
   char tmp[DEFAULT_BUF_SIZE];

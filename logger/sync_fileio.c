@@ -1,10 +1,9 @@
 /**
  *  @file sync_fileio.c
- *  @author Adam Nuhaily
- *  @date 18 Feb 2018
+ *  @author Adam Nuhaily and Andrew Kuklinski
+ *  @date 17 Mar 2018
  *  @brief file io operations with mutex locking
- *  This source file implements thread-safe file io operations for use
- *  with the multithreaded program hw3.c
+ *  This source file implements thread-safe file io operations
  */
 
 #include "sync_fileio.h"

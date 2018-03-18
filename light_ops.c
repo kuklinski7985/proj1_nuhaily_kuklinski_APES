@@ -8,17 +8,6 @@
 #include "light_ops.h"
 #include "ipc_messq.h"
 
-/*
-typedef struct ipcmessage{
-  char timestamp[10];
-  message_t type;                   //message identifier
-  location_t source;                //where message originates from
-  pid_t src_pid;                    //pid of process creating the message
-  location_t destination;           //final destination for message
-  char* message;               //data being requested from sensors
-} ipcmessage_t;
-*/
-
 int bizzounce;
 int lightsensor;          //used for return value for open(), file indicator
 
@@ -33,6 +22,11 @@ char* i2c_path = "/dev/i2c-2";
 extern int light_hb_count;
 extern int light_hb_err;
 
+/**
+ * @brief Light sensor thread handler function.
+ * 
+ * @return void* 
+ */
 void *light_ops()
 {
   char sensorid[2];
@@ -41,6 +35,7 @@ void *light_ops()
   light_previous = 1.0; // initialize at day-night border
   //signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
 
+  // Form and send thread wakeup message through IPC queue to logfile
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = INFO;
   ipc_msg.source = IPC_LIGHT;
@@ -50,13 +45,15 @@ void *light_ops()
   build_ipc_msg(ipc_msg, msg_str);
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
 
+  // Initialize light sensor
   lightsensor = i2c_init(i2c_path, light_addr);
 
-  if(light_power_test() == 2) // transfer all this to a message that gets sent to main
-  { // do not do printf here or anywhere outside of main (in final version)
+  // Light sensor power-on and ID test
+  if(light_power_test() == 2) 
+  {
     light_r_id_reg(lightsensor, sensorid);
   }
-  // need a queue to receive and process commands from main
+  // Send light sensor power-on state to logfile through main IPC queue
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = INFO;
   ipc_msg.source = IPC_LIGHT;
@@ -65,18 +62,19 @@ void *light_ops()
   sprintf(ipc_msg.payload, "%s%x%s", "Connecting to light sensor: ID=0x", sensorid[0], "\0");
   build_ipc_msg(ipc_msg, msg_str);
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+  
+  // Initialize light counter
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   light_counter_init(delay_time);
 
   while(bizzounce == 0)
-    {
-      //mq_send(ipc_queue,"message from light to main\0",27, 0);
-      //usleep(500000);   //500000 sends every half a second
-      //sleep(1);
-      light_hb_count = 0;
-      light_hb_err = 0;
-    }
+  {
+    // Light thread heartbeat/watchdog update
+    light_hb_count = 0;
+    light_hb_err = 0;
+  }
 
+  // Form and send light sensor graceful exit message to log
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = INFO;
   ipc_msg.source = IPC_TEMP;
@@ -90,12 +88,22 @@ void *light_ops()
 
 }
 
+/**
+ * @brief Handle exit signal for light sensor thread
+ * 
+ * @param signum 
+ */
 void light_ops_exit(int signum)
 {
   printf("exit signal received : light_ops thread!\n\n");
   bizzounce=1;
 }
 
+/**
+ * @brief Handler function for light sensor timer overflow. Collect data and send to log.
+ * 
+ * @param sigval 
+ */
 void light_timer_handler(union sigval arg)
 {
   char readbuf[2];
@@ -104,13 +112,14 @@ void light_timer_handler(union sigval arg)
   int ch1;
   ipcmessage_t ipc_msg;
   float light_current = 0;
+  
+  // Read 2-byte data from ADC and format
   light_r_adc(lightsensor, 0, readbuf);
   ch0 = (int)readbuf[1] << 8 | (int)readbuf[0];
   light_r_adc(lightsensor, 1, readbuf);
   ch1 = (int)readbuf[1] << 8 | (int)readbuf[0];
-//  printf("Lux: %f\n", counts_to_lux(ch0, ch1));
-//  light_w_timing_reg(lightsensor, GAIN_HIGH, INTEG_101MS, readbuf);
 
+  // Form logfile string and transmit through IPC queue
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = DATA;
   ipc_msg.source = IPC_LIGHT;
@@ -125,6 +134,7 @@ void light_timer_handler(union sigval arg)
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
   memset(msg_str, 0, strlen(msg_str));
 
+  // Detect day/night transitions, form logfile and send through IPC queue
   if(light_current > 1 && light_previous <= 1)
   {
     strcpy(ipc_msg.timestamp, getCurrentTimeStr());
@@ -150,10 +160,13 @@ void light_timer_handler(union sigval arg)
   }
   light_previous = light_current;
   
-  //sprintf(light_global, "%f", light_previous);
-//  printf("IPC queue status from light thread: %s\n", strerror(errno));
 }
 
+/**
+ * @brief Initialize light sensor counter
+ * 
+ * @param firedelay 
+ */
 void light_counter_init(unsigned long long int firedelay)
 {
   timer_t timer;
@@ -168,11 +181,13 @@ void light_counter_init(unsigned long long int firedelay)
   timer_actions.sigev_notify_function = light_timer_handler;
   timer_actions.sigev_notify_attributes = NULL;
 
+  // Ignore passed-in value for now, configure for 1 second iteration
   timer_interval.it_value.tv_sec = 1; //firedelay / 10000000000;
   timer_interval.it_value.tv_nsec = 0; //firedelay % 10000000000;
   timer_interval.it_interval.tv_sec = timer_interval.it_value.tv_sec;//0;
   timer_interval.it_interval.tv_nsec = timer_interval.it_value.tv_nsec;//0;
 
+  // Create timer with configured settings
   int timer_status;
   timer_status = timer_create(CLOCK_REALTIME, &timer_actions, &timer);  //creates new timer
   if(timer_status == -1)
@@ -189,6 +204,11 @@ void light_counter_init(unsigned long long int firedelay)
     }
 }
 
+/**
+ * @brief Test light sensor by attempting to power it on and read control register
+ * 
+ * @return int 
+ */
 int light_power_test()
 {
   char readbuf[1];  // read buffer from light sensor
@@ -211,6 +231,13 @@ int light_power_test()
   return pass_count;
 }
 
+/**
+ * @brief Convert 2-byte ADC counts to lux (float) (see ADPS-9301 datasheet)
+ * 
+ * @param ch0 
+ * @param ch1 
+ * @return float 
+ */
 float counts_to_lux(int ch0, int ch1)
 {
   float range = (float)ch1 / (float)ch0;

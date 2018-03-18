@@ -1,6 +1,6 @@
 /**
 * @file light_ops.h
-* @brief fxn prototypes for temp sensor thread and timer
+* @brief fxn prototypes for light sensor thread and timer
 * @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/
