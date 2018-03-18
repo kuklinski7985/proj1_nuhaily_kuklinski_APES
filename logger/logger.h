@@ -31,6 +31,7 @@
 #include <mqueue.h>
 #include <errno.h>
 #include "sync_fileio.h"
+#include "../ipc_messq.h"
 
 #define LOG_MAX_ELEMENTS  64
 #define LOG_ELEMENT_SIZE  128
@@ -61,7 +62,6 @@ void writeLogStruct(file_t* logfile, log_struct_t logitem);
 void writeLogStr(file_t* logfile, char* log_str);
 char* getCurrentTimeStr();
 int8_t thread_sprintf(char* rtn_ascii, long lng, char format[]);
-
 
 
 #endif

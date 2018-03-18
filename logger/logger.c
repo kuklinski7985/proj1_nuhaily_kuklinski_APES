@@ -8,9 +8,12 @@ pthread_mutex_t sprintf_mutex;
 
 extern int bizzounce;
 extern mqd_t log_queue;
-
+extern mqd_t ipc_queue;
 
 extern file_t logfile;
+
+extern int log_hb_count;
+extern int log_hb_err;
 
 //TODO set up shared memory to indicate when logger queue is initialized so that other
 // threads don't try to write to it before it's ready
@@ -23,29 +26,13 @@ void* logger()
   char queue_buf[256];
  // char* queue_buf = (char)malloc(sizeof(char)*LOG_ELEMENT_SIZE);
   unsigned int prio;
-  //printf("***Entering log queue***\n***************\n");
-  // Temporary manual set of logfile name
-  strcpy(logfile.filename, "prj.log");
-
-  fileCreate(&logfile);
-  //printf("Start of program: log queue uninitialized: %d.\n", log_queue);
-
-  //printf("logger thread: log queue initialized: %d.\n", log_queue);
-  //printf("create log mqueue error: %s\n", strerror(errno));
-
- /* qnotify.sigev_notify = SIGEV_THREAD;
-  qnotify.sigev_notify_function = logger_handler;
-  qnotify.sigev_notify_attributes = NULL;
-  qnotify.sigev_value.sival_ptr = NULL;*/
-  //mq_notify(log_queue, &qnotify);
-
-  //  printf("mq_notify error: %s\n", strerror(errno));
- // printf("Trying to push to queue from logger thread...\n");
-  //mq_send(log_queue, "9\0", 2, 0);
-  //printf("logger mq_send: %s\n", strerror(errno));
-
-  //signal(SIGUSR1, log_exit);    //signal handler for temp_ops function
+  ipcmessage_t ipc_msg;
+  char msg_str[256];
   
+ // strcpy(logfile.filename, "prj.log");
+
+ // fileCreate(&logfile);
+
   while(bizzounce == 0)
   {
     mq_getattr(log_queue, &log_attr);  //keeps the thread alive to process signals and timer requests
@@ -57,7 +44,8 @@ void* logger()
       mq_getattr(log_queue, &log_attr);
       memset(queue_buf, 0, strlen(queue_buf));
     }
-
+    log_hb_count = 0;
+    log_hb_err = 0;
   }
   // close file
   fileClose(&logfile);
@@ -189,5 +177,4 @@ int8_t thread_sprintf(char* rtn_ascii, long lng, char format[])
   pthread_mutex_unlock(&sprintf_mutex);
   return 0;
 }
-
 

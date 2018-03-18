@@ -1,6 +1,6 @@
 /**
 * @file light_ops.c
-* @brief fxn definitions for temp sensor threading opertions and timer
+* @brief fxn definitions for light sensor threading opertions and timer
 * @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/
@@ -25,9 +25,13 @@ int lightsensor;          //used for return value for open(), file indicator
 float light_previous;     // previously-measured light value
 char * light_global;
 int light_addr = 0x39;       //slave address for the temp sensor
+
 char light_readbuf[2];    //array for reading and sending data to sensor
 char light_wrbuf[2] = {0};
 char* i2c_path = "/dev/i2c-2";
+
+extern int light_hb_count;
+extern int light_hb_err;
 
 void *light_ops()
 {
@@ -35,7 +39,17 @@ void *light_ops()
   ipcmessage_t ipc_msg;
   char msg_str[PAYLOAD_MAX_SIZE];
   light_previous = 1.0; // initialize at day-night border
-  signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
+  //signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
+
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_LIGHT;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Light sensor ops thread initialized.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+
   lightsensor = i2c_init(i2c_path, light_addr);
 
   if(light_power_test() == 2) // transfer all this to a message that gets sent to main
@@ -59,7 +73,19 @@ void *light_ops()
       //mq_send(ipc_queue,"message from light to main\0",27, 0);
       //usleep(500000);   //500000 sends every half a second
       //sleep(1);
+      light_hb_count = 0;
+      light_hb_err = 0;
     }
+
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_TEMP;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Light sensor ops thread exiting.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+
   return 0;
 
 }
@@ -74,7 +100,6 @@ void light_timer_handler(union sigval arg)
 {
   char readbuf[2];
   char msg_str[256];
-  char temp_str[256];
   int ch0;
   int ch1;
   ipcmessage_t ipc_msg;
@@ -143,8 +168,8 @@ void light_counter_init(unsigned long long int firedelay)
   timer_actions.sigev_notify_function = light_timer_handler;
   timer_actions.sigev_notify_attributes = NULL;
 
-  timer_interval.it_value.tv_sec = firedelay / 10000000000;
-  timer_interval.it_value.tv_nsec = firedelay % 10000000000;
+  timer_interval.it_value.tv_sec = 1; //firedelay / 10000000000;
+  timer_interval.it_value.tv_nsec = 0; //firedelay % 10000000000;
   timer_interval.it_interval.tv_sec = timer_interval.it_value.tv_sec;//0;
   timer_interval.it_interval.tv_nsec = timer_interval.it_value.tv_nsec;//0;
 
@@ -184,7 +209,6 @@ int light_power_test()
   }
 
   return pass_count;
-
 }
 
 float counts_to_lux(int ch0, int ch1)

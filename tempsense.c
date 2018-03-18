@@ -122,14 +122,16 @@ void w_config_reg(int fd, char * buff)
 int r_config_reg(int fd)
 {
   char reg_pick[1] = {CONFIG_REG};
+  char config_reg_val[2] = {0, 0};
+  int cfg_reg = 0;
+
   i2c_write(fd, reg_pick, 1);
+  i2c_read(fd, config_reg_val, 2);
 
-  char config_reg_val[1] = {0};
-  i2c_read(fd,config_reg_val,1);
-
+  cfg_reg = (config_reg_val[0] << 8) | (config_reg_val[1]);
   //printf("current configuration value: %x\n",config_reg_val[0]);
 
-  return config_reg_val[0];
+  return cfg_reg;
 }
 
 float display_c(char * buff)
@@ -137,6 +139,10 @@ float display_c(char * buff)
   int temp_final;
   float celsius;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
+  if(detect_twos(temp_final) == 1)
+  {
+    temp_final = -1*convert_twos( (uint16_t)temp_final );
+  }
   celsius = temp_final * 0.0625;
   //printf("degree-C: %04f\n",celsius);
   return celsius;
@@ -147,6 +153,10 @@ float display_f(char * buff)
   int temp_final;
   float farh;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
+  if(detect_twos(temp_final) == 1)
+  {
+    temp_final = -1*convert_twos( (uint16_t)temp_final );
+  }
   farh = (1.8*(temp_final * 0.0625) +32);
   //printf("degree-F: %04f\n",farh);
   return farh;
@@ -157,7 +167,23 @@ float display_k(char * buff)
   int temp_final;
   float kelvin;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
+  if(detect_twos(temp_final) == 1)
+  {
+    temp_final = -1*convert_twos( (uint16_t)temp_final );
+  }
   kelvin = (temp_final * 0.0625) + 273.15;
   //printf("degree-K: %04f\n",kelvin);
   return kelvin;
+}
+
+int detect_twos(int in)
+{
+  return ( (uint16_t)in / 0x8000 );
+}
+
+uint16_t convert_twos(uint16_t in)
+{
+  in = ~in;
+  in++;
+  return in; 
 }

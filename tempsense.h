@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include "i2c_wrapper.h"
 
 #define PTRREG_SD_MASK      0x01
@@ -54,5 +55,8 @@ float display_f(char * buff);  //complete
 
 float display_k(char * buff);  //complete
 
+int detect_twos(int in);
+
+uint16_t convert_twos(uint16_t in);
 
 #endif /*__tempsense_h_*/

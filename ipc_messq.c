@@ -7,6 +7,15 @@
 
 #include "ipc_messq.h"
 
+extern int temp_hb_count;
+extern int temp_hb_err;
+extern int light_hb_count;
+extern int light_hb_err;
+extern int log_hb_count;
+extern int log_hb_err;
+extern int hb_hb_count;
+extern int hb_hb_err;
+
 void shuffler_king()      //main Q, receives messages from all Q's
 { 
 
@@ -20,27 +29,53 @@ void shuffler_king()      //main Q, receives messages from all Q's
   //printf("Main Q read message: %s | %s | %d\n", testing.payload, testing.timestamp, testing.destination);
   //printf("destination: %d\n", ipc_msg.destination);
 
-  switch(ipc_msg.destination) {
+  switch(ipc_msg.destination) 
+  {
       case(IPC_MAIN):
-        //add functionality to process message
-        //doesnt need to send out message like others
-        //print_ipc_msg(ipc_msg);
+        if(ipc_msg.type == HEARTBEAT)
+        {
+          switch(ipc_msg.source)
+          {
+            case(IPC_TEMP):
+              temp_hb_count = 0;
+              temp_hb_err = 0;
+              printf("reset temp hb counter.\n");
+              break;
+            case(IPC_LIGHT):
+              light_hb_count = 0;
+              light_hb_err = 0;
+              printf("reset temp hb counter.\n");
+              break;
+            case(IPC_LOG):
+              log_hb_count = 0;
+              log_hb_err = 0;
+              printf("reset temp hb counter.\n");
+              break;              
+            default:
+              break;
+          }
+        }
         break;
+
        case(IPC_LOG):
         //print_ipc_msg(ipc_msg);
-        manage_ipc_msg(ipc_msg, 1, log_str);
+        manage_ipc_msg(ipc_msg, log_str);
         mq_send(log_queue, log_str, strlen(log_str), 0);
         break;
+
       case(IPC_USER):
         break;
+
       case(IPC_TEMP):
         mq_send(temp_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
         break;
+
       case(IPC_LIGHT):
         mq_send(light_ipc_queue, ipc_queue_buff,strlen(ipc_queue_buff),0);
         //print_ipc_msg(ipc_msg);
         //printf("light case*****************\n");
         break;
+      
       case(IPC_NONE):
       default:
         printf("Destination %d not valid\n", ipc_msg.destination);
@@ -73,7 +108,7 @@ void ipc_queue_init()
   ipc_attr.mq_flags = 0;
 
   ipc_queue = mq_open("/ipc_main", O_CREAT | O_RDWR, 0666, &ipc_attr);
-  printf("IPC queue init status: %s\n", strerror(errno));
+  //printf("IPC queue init status: %s\n", strerror(errno));
 
 }
 
@@ -85,7 +120,7 @@ void log_queue_init()
   log_attr.mq_flags = 0;
 
   log_queue = mq_open("/log", O_CREAT | O_RDWR, 0666, &log_attr);
-  printf("Log queue init status: %s\n", strerror(errno));
+  //printf("Log queue init status: %s\n", strerror(errno));
 }
 
 void temp_ipc_queue_init()
@@ -205,22 +240,22 @@ void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
 {
   char tmp[256];
- // printf("a\n");
+//  printf("a\n");
   strcpy(ipc_msg, msg_struct.timestamp);
   strcat(ipc_msg, "\n");
- // printf("b\n");
+//  printf("b\n");
   sprintf(tmp, "%d", msg_struct.type);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
- // printf("c\n");
+//  printf("c\n");
   sprintf(tmp, "%d", msg_struct.source);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
- // printf("d\n");
+//  printf("d\n");
   sprintf(tmp, "%d", (int)msg_struct.src_pid);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
- // printf("e\n");
+//  printf("e\n");
   sprintf(tmp, "%d", msg_struct.destination);
   strcat(ipc_msg, tmp);
   strcat(ipc_msg, "\n");
@@ -229,39 +264,59 @@ void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
   strcat(ipc_msg, "\n");
 }
 
-void manage_ipc_msg(ipcmessage_t msg, int log_en, char* log_str)
+void manage_ipc_msg(ipcmessage_t msg, char* log_str)
 {
   char tmp[256];
+  char loglevel[16];
+  char sourceid[64];
 
   switch(msg.type)
   {
     case(DATA):
-      //printf("%s", msg.timestamp);
-    //  strcpy(log_str, msg.timestamp);
-    // printf("1\n");
+      strcpy(loglevel, "DATA: ");
       if(msg.source == IPC_LIGHT)
       {
         //printf("Light sensor reads: %s lumens.\n", msg.payload);
-        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, "Light sensor reads: ", msg.payload, " lux");
+        sprintf(tmp, "%s%s%s%s%s.\n", msg.timestamp, loglevel, "Light sensor reads: ", msg.payload, " lux");
     
       }
       else if(msg.source == IPC_TEMP)
       {
-      //  printf("Temp sensor reads: %s degF.\n", msg.payload);
-        sprintf(tmp, "%s%s%s.\n", msg.timestamp, "Temp sensor reads: ", msg.payload);
-      } // we need to be able to switch between degree units, maybe another ipcmessage_t element for units?
+        sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, loglevel, "Temp sensor reads: ", msg.payload);
+      }
       break;
-    case(INFO):    
-      if(msg.source == IPC_LIGHT || msg.source == IPC_TEMP)
+    case(INFO):
+      strcpy(loglevel, "INFO: "); 
+      switch(msg.source)
       {
-        sprintf(tmp, "%s\n", msg.payload);
-      }     
+        case(IPC_LIGHT):
+          strcpy(sourceid, "Light sensor message: ");
+          break;
+        case(IPC_TEMP):
+          strcpy(sourceid, "Temp sensor message: ");
+          break;
+        case(IPC_LOG):
+          strcpy(sourceid, "Logger message: ");
+          break;
+        case(IPC_MAIN):
+          strcpy(sourceid, "Main message: ");
+          break;
+        case(IPC_HB):
+          strcpy(sourceid, "Heartbeat thread: ");
+          break;
+        default:
+          strcpy(sourceid, "err (sourceid) ");
+          break;
+      }
+
+      snprintf(tmp, 256, "%s%s%s%s\n", msg.timestamp, loglevel, sourceid, msg.payload);
       break;
+
     default:
       break;
   }
   
   strcpy(log_str, tmp);
   printf("%s", log_str);
-}
 
+}
