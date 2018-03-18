@@ -19,11 +19,11 @@ extern int hb_hb_err;
 void shuffler_king()      //main Q, receives messages from all Q's
 { 
 
-  char ipc_queue_buff[IPC_ELEMENT_SIZE];
-  char log_str[IPC_ELEMENT_SIZE];
+  char ipc_queue_buff[DEFAULT_BUF_SIZE];
+  char log_str[DEFAULT_BUF_SIZE];
   ipcmessage_t ipc_msg;
 
-  mq_receive(ipc_queue, ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
+  mq_receive(ipc_queue, ipc_queue_buff, DEFAULT_BUF_SIZE, NULL);
   decipher_ipc_msg(ipc_queue_buff, &ipc_msg);
 
   //printf("Main Q read message: %s | %s | %d\n", testing.payload, testing.timestamp, testing.destination);
@@ -85,7 +85,7 @@ void shuffler_king()      //main Q, receives messages from all Q's
 
 void shuffler_mini_temp()
 {
-  char temp_ipc_queue_buff[IPC_ELEMENT_SIZE];
+  char temp_ipc_queue_buff[DEFAULT_BUF_SIZE];
   
   if (mq_notify(temp_ipc_queue, &sigevent_temp_ipc_notify) == -1)
     {
@@ -95,7 +95,7 @@ void shuffler_mini_temp()
   mq_getattr(temp_ipc_queue, &temp_ipc_attr);
   while(temp_ipc_attr.mq_curmsgs > 0)
     {
-      mq_receive(temp_ipc_queue, temp_ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
+      mq_receive(temp_ipc_queue, temp_ipc_queue_buff, DEFAULT_BUF_SIZE, NULL);
       mq_getattr(temp_ipc_queue, &temp_ipc_attr);
       //printf("remaining on temp queue %ld\n",temp_ipc_attr.mq_curmsgs);
       //printf("Temp Q read message: %s\n",temp_ipc_queue_buff);
@@ -105,7 +105,7 @@ void shuffler_mini_temp()
 void ipc_queue_init()
 {
   ipc_attr.mq_maxmsg = 255;
-  ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
+  ipc_attr.mq_msgsize = sizeof(char)*DEFAULT_BUF_SIZE;
   ipc_attr.mq_flags = 0;
 
   ipc_queue = mq_open("/ipc_main", O_CREAT | O_RDWR, 0666, &ipc_attr);
@@ -117,7 +117,7 @@ void log_queue_init()
 {
   struct mq_attr log_attr;
   log_attr.mq_maxmsg = 255;
-  log_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
+  log_attr.mq_msgsize = sizeof(char)*DEFAULT_BUF_SIZE;
   log_attr.mq_flags = 0;
 
   log_queue = mq_open("/log", O_CREAT | O_RDWR, 0666, &log_attr);
@@ -129,7 +129,7 @@ void temp_ipc_queue_init()
   //struct mq_attr temp_ipc_attr;
 
   temp_ipc_attr.mq_maxmsg = 255;
-  temp_ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
+  temp_ipc_attr.mq_msgsize = sizeof(char)*DEFAULT_BUF_SIZE;
   temp_ipc_attr.mq_flags = 0;
 
   temp_ipc_queue = mq_open("/ipctemperature", O_CREAT | O_RDWR, 0666, &temp_ipc_attr);
@@ -150,7 +150,7 @@ void light_ipc_queue_init()
   //struct mq_attr light_ipc_attr;
 
   light_ipc_attr.mq_maxmsg = 255;
-  light_ipc_attr.mq_msgsize = sizeof(char)*IPC_ELEMENT_SIZE;
+  light_ipc_attr.mq_msgsize = sizeof(char)*DEFAULT_BUF_SIZE;
   light_ipc_attr.mq_flags = 0;
 
   light_ipc_queue = mq_open("/ipclight", O_CREAT | O_RDWR, 0666, &temp_ipc_attr);
@@ -168,7 +168,7 @@ void light_ipc_queue_init()
 
 void shuffler_mini_light()
 {
-  char light_ipc_queue_buff[IPC_ELEMENT_SIZE];
+  char light_ipc_queue_buff[DEFAULT_BUF_SIZE];
   printf("entering light shuffler\n");
   
   if (mq_notify(light_ipc_queue, &sigevent_light_ipc_notify) == -1)
@@ -179,7 +179,7 @@ void shuffler_mini_light()
   mq_getattr(light_ipc_queue, &light_ipc_attr);
   while(light_ipc_attr.mq_curmsgs > 0)
     {
-      mq_receive(light_ipc_queue, light_ipc_queue_buff, IPC_ELEMENT_SIZE, NULL);
+      mq_receive(light_ipc_queue, light_ipc_queue_buff, DEFAULT_BUF_SIZE, NULL);
       mq_getattr(light_ipc_queue, &light_ipc_attr);
       //printf("remaining on temp queue %ld\n",light_ipc_attr.mq_curmsgs);
       printf("Light Q read message: %s\n",light_ipc_queue_buff);
@@ -240,7 +240,7 @@ void decipher_ipc_msg(char* ipc_msg, ipcmessage_t* msg_struct)
 
 void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
 {
-  char tmp[256];
+  char tmp[DEFAULT_BUF_SIZE];
 //  printf("a\n");
   strcpy(ipc_msg, msg_struct.timestamp);
   strcat(ipc_msg, "\n");
@@ -267,7 +267,7 @@ void build_ipc_msg(ipcmessage_t msg_struct, char* ipc_msg)
 
 void manage_ipc_msg(ipcmessage_t msg, char* log_str)
 {
-  char tmp[256];
+  char tmp[DEFAULT_BUF_SIZE];
   char loglevel[16];
   char sourceid[64];
 
@@ -310,7 +310,7 @@ void manage_ipc_msg(ipcmessage_t msg, char* log_str)
           break;
       }
 
-      snprintf(tmp, 256, "%s%s%s%s\n", msg.timestamp, loglevel, sourceid, msg.payload);
+      snprintf(tmp, DEFAULT_BUF_SIZE, "%s%s%s%s\n", msg.timestamp, loglevel, sourceid, msg.payload);
       break;
 
     default:

@@ -38,7 +38,7 @@ int log_hb_err;
 
 int main(int argc, char* argv[])
 {
-  char ipc_queue_buff[256];
+  char ipc_queue_buff[DEFAULT_BUF_SIZE];
   
   ipc_queue_init();           //main queue created
   log_queue_init();
@@ -47,10 +47,10 @@ int main(int argc, char* argv[])
 
   int checking;                    //check value for pthread creation
   input_struct * input1;           //input for pthread,couldnt get to work w/o
-  char msg_str[256];
-  char buf1[255];
+  char msg_str[DEFAULT_BUF_SIZE];
+  char buf1[DEFAULT_BUF_SIZE];
 
-  char log_filename[256];
+  char log_filename[DEFAULT_BUF_SIZE];
   ipcmessage_t ipc_msg;
  // remote_socket_server_init();
 
@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
 
 void* heartbeat()
 {
-  char msg_str[256];
+  char msg_str[DEFAULT_BUF_SIZE];
   ipcmessage_t ipc_msg;
 
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());

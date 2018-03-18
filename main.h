@@ -27,6 +27,8 @@
 #include "ipc_messq.h"
 //#include "myusrled.h"
 
+#define DEFAULT_BUF_SIZE    256
+
 typedef struct input_struct{
   int member1;
 } input_struct;

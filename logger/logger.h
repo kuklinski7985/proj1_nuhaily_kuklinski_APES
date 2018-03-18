@@ -33,9 +33,7 @@
 #include "sync_fileio.h"
 #include "../ipc_messq.h"
 
-#define LOG_MAX_ELEMENTS  64
-#define LOG_ELEMENT_SIZE  128
-#define LOG_LINE_SIZE     255
+#define DEFAULT_BUF_SIZE     256
 
 typedef enum
 {
@@ -45,20 +43,9 @@ typedef enum
   LIGHT
 } log_type_t;
 
-typedef struct
-{
-  char timestamp[10];
-  double float_data;
-  char str_data[LOG_ELEMENT_SIZE];
-  int int_data;
-  char data_units[LOG_ELEMENT_SIZE]; // doesn't need to be this big
-  log_type_t msg_type;
-} log_struct_t;
-
 void* logger();
 static void logger_handler();
 void log_exit();
-void writeLogStruct(file_t* logfile, log_struct_t logitem);
 void writeLogStr(file_t* logfile, char* log_str);
 char* getCurrentTimeStr();
 int8_t thread_sprintf(char* rtn_ascii, long lng, char format[]);

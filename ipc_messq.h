@@ -29,8 +29,7 @@
 #ifndef ipc_messq_h_
 #define ipc_messq_h_
 
-#define IPC_ELEMENT_SIZE   256
-#define PAYLOAD_MAX_SIZE   256
+#define DEFAULT_BUF_SIZE   256
 
 extern file_t ipcfile;         //creates a file where queue info is stored, mounted
 extern file_t tempipcfile;     //creates file where temperature queue info is stored, mounted
@@ -68,7 +67,7 @@ typedef struct ipcmessage {
   location_t source;                //where message originates from
   pid_t src_pid;                    //pid of process creating the message
   location_t destination;           //final destination for message
-  char payload[PAYLOAD_MAX_SIZE];   // message to transmit
+  char payload[DEFAULT_BUF_SIZE];   // message to transmit
   temp_unit_t units_temp;
 } ipcmessage_t;
 

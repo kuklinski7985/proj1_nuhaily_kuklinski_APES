@@ -37,7 +37,7 @@ void *light_ops()
 {
   char sensorid[2];
   ipcmessage_t ipc_msg;
-  char msg_str[PAYLOAD_MAX_SIZE];
+  char msg_str[DEFAULT_BUF_SIZE];
   light_previous = 1.0; // initialize at day-night border
   //signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
 
@@ -99,7 +99,7 @@ void light_ops_exit(int signum)
 void light_timer_handler(union sigval arg)
 {
   char readbuf[2];
-  char msg_str[256];
+  char msg_str[DEFAULT_BUF_SIZE];
   int ch0;
   int ch1;
   ipcmessage_t ipc_msg;

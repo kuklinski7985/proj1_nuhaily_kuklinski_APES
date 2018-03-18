@@ -25,6 +25,8 @@
 #include "lightsense.h"
 #include "ipc_messq.h"
 
+#define DEFAULT_BUF_SIZE    256
+
 void *light_ops();
 void light_ops_exit(int signum);
 void light_counter_init(unsigned long long int firedelay);

@@ -23,11 +23,11 @@ void* logger()
   // initialize log queue
   struct mq_attr log_attr;
  // struct sigevent qnotify;
-  char queue_buf[256];
- // char* queue_buf = (char)malloc(sizeof(char)*LOG_ELEMENT_SIZE);
+  char queue_buf[DEFAULT_BUF_SIZE];
+ // char* queue_buf = (char)malloc(sizeof(char)*DEFAULT_BUF_SIZE);
   unsigned int prio;
   ipcmessage_t ipc_msg;
-  char msg_str[256];
+  char msg_str[DEFAULT_BUF_SIZE];
   
  // strcpy(logfile.filename, "prj.log");
 
@@ -39,7 +39,7 @@ void* logger()
     while(log_attr.mq_curmsgs > 0)
     {
      // printf("1\n");
-      mq_receive(log_queue, queue_buf, 256, &prio);
+      mq_receive(log_queue, queue_buf, DEFAULT_BUF_SIZE, &prio);
       writeLogStr(&logfile, queue_buf);
       mq_getattr(log_queue, &log_attr);
       memset(queue_buf, 0, strlen(queue_buf));
@@ -53,12 +53,12 @@ void* logger()
 
 static void logger_handler()
 {
-  char queue_buf[256];
+  char queue_buf[DEFAULT_BUF_SIZE];
   unsigned int prio;
   // file ops:
   // open file
   // read from queue
-  mq_receive(log_queue, queue_buf, LOG_ELEMENT_SIZE, &prio);
+  mq_receive(log_queue, queue_buf, DEFAULT_BUF_SIZE, &prio);
  // printf("**log queue received data**\n");
 
   //printf("Data received: %s\n", queue_buf);
@@ -72,51 +72,6 @@ static void logger_handler()
 void log_exit()
 {
   printf("exit signal received : log thread!\n\n");
-}
-
-void writeLogStruct(file_t* logfile, log_struct_t logitem)
-{
-  // logfile element: timestamp, log "level", source ID, log message
-  char logfile_entry[LOG_LINE_SIZE];
-  char ascii_buf[64];
-
-  strcpy(logfile_entry, getCurrentTimeStr());
-
- // printf("Writing element to log.\n");
-  switch(logitem.msg_type) // needs timestamps
-  {
-    case ERROR:
-      strcat(logfile_entry, "ERROR -- ");
-      strcat(logfile_entry, logitem.str_data);
-      strcat(logfile_entry, "\n");
-      break;
-    case MESSAGE:
-      //strcat(logfile_entry, "");
-  //    strcat(logfile_entry, *(logitem->str_data));
-      strcat(logfile_entry, "\n");
-      break;
-    case TEMP:
-      strcat(logfile_entry, "Temperature: ");
-      sprintf(ascii_buf, "%f", logitem.float_data);
-      strcat(logfile_entry, ascii_buf);
-      strcat(logfile_entry, logitem.data_units);
-      strcat(logfile_entry, "\n");
-      break;
-    case LIGHT:
-      strcat(logfile_entry, "Lux: ");
-      sprintf(ascii_buf, "%f", logitem.float_data);
-      strcat(logfile_entry, ascii_buf);
-      strcat(logfile_entry, logitem.data_units);
-      strcat(logfile_entry, "\n");
-      break;
-    default:
-      break;
-  }
-
-  pthread_mutex_lock(&log_mutex);
-  fileWrite(logfile, logfile_entry);  // logfile is already a pointer no need to
-                                      // pass address-of
-  pthread_mutex_unlock(&log_mutex);
 }
 
 void writeLogStr(file_t* logfile, char* log_str)
