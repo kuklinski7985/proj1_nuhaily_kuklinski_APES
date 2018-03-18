@@ -53,12 +53,12 @@ extern file_t ipcfile;
 
 /*types of messages that are possible*/
 typedef enum{
-  QUERY, DATA, INFO, TERMINATE
+  QUERY, DATA, INFO, TERMINATE, HEARTBEAT
 } message_t;
 
 /*locations messages can be sent to and received from*/
 typedef enum{
-  IPC_NONE, IPC_LOG, IPC_TEMP, IPC_LIGHT, IPC_MAIN, IPC_SOCKET, IPC_USER
+  IPC_NONE, IPC_LOG, IPC_TEMP, IPC_LIGHT, IPC_MAIN, IPC_SOCKET, IPC_USER, IPC_HB
 } location_t;
 
 

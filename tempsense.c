@@ -122,14 +122,16 @@ void w_config_reg(int fd, char * buff)
 int r_config_reg(int fd)
 {
   char reg_pick[1] = {CONFIG_REG};
+  char config_reg_val[2] = {0, 0};
+  int cfg_reg = 0;
+
   i2c_write(fd, reg_pick, 1);
+  i2c_read(fd, config_reg_val, 2);
 
-  char config_reg_val[1] = {0};
-  i2c_read(fd,config_reg_val,1);
-
+  cfg_reg = (config_reg_val[0] << 8) | (config_reg_val[1]);
   //printf("current configuration value: %x\n",config_reg_val[0]);
 
-  return config_reg_val[0];
+  return cfg_reg;
 }
 
 float display_c(char * buff)

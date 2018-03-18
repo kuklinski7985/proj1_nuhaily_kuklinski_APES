@@ -64,5 +64,4 @@ char* getCurrentTimeStr();
 int8_t thread_sprintf(char* rtn_ascii, long lng, char format[]);
 
 
-
 #endif

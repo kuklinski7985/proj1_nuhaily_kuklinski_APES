@@ -12,6 +12,9 @@ extern mqd_t ipc_queue;
 
 extern file_t logfile;
 
+extern int log_hb_count;
+extern int log_hb_err;
+
 //TODO set up shared memory to indicate when logger queue is initialized so that other
 // threads don't try to write to it before it's ready
 
@@ -25,17 +28,9 @@ void* logger()
   unsigned int prio;
   ipcmessage_t ipc_msg;
   char msg_str[256];
+  
   //printf("***Entering log queue***\n***************\n");
   // Temporary manual set of logfile name
-  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
-  ipc_msg.type = INFO;
-  ipc_msg.source = IPC_LOG;
-  ipc_msg.destination = IPC_LOG;
-  ipc_msg.src_pid = getpid();
-  strcpy(ipc_msg.payload, "Logger thread initialized.\n");
-  build_ipc_msg(ipc_msg, msg_str);
-  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
-  
   strcpy(logfile.filename, "prj.log");
 
   fileCreate(&logfile);
@@ -55,7 +50,7 @@ void* logger()
   //mq_send(log_queue, "9\0", 2, 0);
   //printf("logger mq_send: %s\n", strerror(errno));
 
-  //signal(SIGUSR1, log_exit);    //signal handler for temp_ops function
+  //signal(SIGUSR1, log_exit);    //signal handler for log_ops function
   
   while(bizzounce == 0)
   {
@@ -68,7 +63,8 @@ void* logger()
       mq_getattr(log_queue, &log_attr);
       memset(queue_buf, 0, strlen(queue_buf));
     }
-
+    log_hb_count = 0;
+    log_hb_err = 0;
   }
   // close file
   fileClose(&logfile);
@@ -200,5 +196,4 @@ int8_t thread_sprintf(char* rtn_ascii, long lng, char format[])
   pthread_mutex_unlock(&sprintf_mutex);
   return 0;
 }
-
 

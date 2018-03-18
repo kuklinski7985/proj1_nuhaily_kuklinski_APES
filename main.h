@@ -48,3 +48,7 @@ mqd_t temp_ipc_queue;      //queue associated with temp sensor
 mqd_t light_ipc_queue;
 
 struct mq_attr ipc_attr;          //attributes struct for ipc queue
+
+void* heartbeat();
+void hb_warn(union sigval arg);
+void hb_hb_fn(union sigval arg);

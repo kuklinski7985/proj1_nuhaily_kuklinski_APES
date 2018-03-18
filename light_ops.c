@@ -1,6 +1,6 @@
 /**
 * @file light_ops.c
-* @brief fxn definitions for temp sensor threading opertions and timer
+* @brief fxn definitions for light sensor threading opertions and timer
 * @author Andrew Kuklinski and Adam Nuhaily
 * @date 03/11/2018
 **/
@@ -23,10 +23,13 @@ int bizzounce;
 int lightsensor;          //used for return value for open(), file indicator
 
 float light_previous;     // previously-measured light value
-int light_addr = 0x39;       //slave address for the temp sensor
+int light_addr = 0x39;       //slave address for the light sensor
 char light_readbuf[2];    //array for reading and sending data to sensor
 char light_wrbuf[2] = {0};
 char* i2c_path = "/dev/i2c-2";
+
+extern int light_hb_count;
+extern int light_hb_err;
 
 void *light_ops()
 {
@@ -35,7 +38,7 @@ void *light_ops()
   char msg_str[PAYLOAD_MAX_SIZE];
   light_previous = 1.0; // initialize at day-night border
   //signal(SIGUSR1, light_ops_exit);    //signal handler for light_ops function
-  
+
   strcpy(ipc_msg.timestamp, getCurrentTimeStr());
   ipc_msg.type = INFO;
   ipc_msg.source = IPC_LIGHT;
@@ -46,6 +49,7 @@ void *light_ops()
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
 
   lightsensor = i2c_init(i2c_path, light_addr);
+
   if(light_power_test() == 2) // transfer all this to a message that gets sent to main
   { // do not do printf here or anywhere outside of main (in final version)
     light_r_id_reg(lightsensor, sensorid);
@@ -67,6 +71,8 @@ void *light_ops()
       //mq_send(ipc_queue,"message from light to main\0",27, 0);
       //usleep(500000);   //500000 sends every half a second
       //sleep(1);
+      light_hb_count = 0;
+      light_hb_err = 0;
     }
   return 0;
 
@@ -82,7 +88,6 @@ void light_timer_handler(union sigval arg)
 {
   char readbuf[2];
   char msg_str[256];
-  char temp_str[256];
   int ch0;
   int ch1;
   ipcmessage_t ipc_msg;
@@ -190,7 +195,6 @@ int light_power_test()
   }
 
   return pass_count;
-
 }
 
 float counts_to_lux(int ch0, int ch1)

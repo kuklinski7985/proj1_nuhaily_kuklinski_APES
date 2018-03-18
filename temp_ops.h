@@ -23,15 +23,15 @@
 #include "i2c_wrapper.h"
 #include "tempsense.h"
 
-void *temp_ops();
-
-void temp_ops_exit(int signum);
-
-void metric_counter_init(unsigned long long int firedelay);
-
 typedef enum {
     UNITS_NONE, UNITS_F, UNITS_C, UNITS_K
 } temp_unit_t;
 
+void *temp_ops();
+void temp_ops_exit(int signum);
+int temp_power_test();
+void metric_counter_init(unsigned long long int firedelay);
+
+//void temp_hb(union sigval arg);
 
 #endif /*__temp_ops_h_*/
