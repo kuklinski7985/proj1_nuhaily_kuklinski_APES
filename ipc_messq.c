@@ -39,17 +39,17 @@ void shuffler_king()      //main Q, receives messages from all Q's
             case(IPC_TEMP):
               temp_hb_count = 0;
               temp_hb_err = 0;
-              printf("reset temp hb counter.\n");
+             // printf("reset temp hb counter.\n");
               break;
             case(IPC_LIGHT):
               light_hb_count = 0;
               light_hb_err = 0;
-              printf("reset temp hb counter.\n");
+             // printf("reset temp hb counter.\n");
               break;
             case(IPC_LOG):
               log_hb_count = 0;
               log_hb_err = 0;
-              printf("reset temp hb counter.\n");
+            //  printf("reset temp hb counter.\n");
               break;              
             default:
               break;
@@ -64,6 +64,7 @@ void shuffler_king()      //main Q, receives messages from all Q's
         break;
 
       case(IPC_USER):
+        mq_send(log_queue, log_str, strlen(log_str), 0);
         break;
 
       case(IPC_TEMP):
@@ -317,6 +318,9 @@ void manage_ipc_msg(ipcmessage_t msg, char* log_str)
   }
   
   strcpy(log_str, tmp);
-  printf("%s", log_str);
+  if(msg.type != IPC_USER)
+  {
+    printf("%s", log_str);
+  }
 
 }

@@ -1,0 +1,9 @@
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/pkgconfig/cmocka.pc
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/cmake/cmocka/cmocka-config.cmake
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/cmake/cmocka/cmocka-config-version.cmake
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/include/cmocka.h
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/include/cmocka_pbc.h
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/libcmocka.so.0.4.0
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/libcmocka.so.0
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/libcmocka.so
+/home/anuhaily/Documents/ecen5013/prj1/proj1/3rd-party/build-Debug/lib/libcmocka.a
