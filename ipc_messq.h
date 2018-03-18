@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <pthread.h>
-#include <sys/types.h>
 #include <linux/kernel.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -25,6 +24,7 @@
 #include <mqueue.h>
 #include <errno.h>
 #include "logger/logger.h"
+#include "temp_ops.h"
 
 #ifndef ipc_messq_h_
 #define ipc_messq_h_
@@ -49,7 +49,6 @@ struct sigevent sigevent_light_ipc_notify;
 extern struct mq_attr ipc_attr;
 
 extern mqd_t ipc_queue;
-extern file_t ipcfile;
 
 /*types of messages that are possible*/
 typedef enum{
@@ -70,6 +69,7 @@ typedef struct ipcmessage {
   pid_t src_pid;                    //pid of process creating the message
   location_t destination;           //final destination for message
   char payload[PAYLOAD_MAX_SIZE];   // message to transmit
+  temp_unit_t units_temp;
 } ipcmessage_t;
 
 void ipc_queue_init();

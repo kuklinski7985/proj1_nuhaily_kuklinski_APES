@@ -8,10 +8,21 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
-
+#include <sys/types.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <errno.h>
+#include <signal.h>
+#include <time.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <mqueue.h>
+
+
+#include "ipc_messq.h"
+#include "temp_ops.h"
 
 
 
@@ -26,7 +37,7 @@
  *@return VOID
  */
 
-void *remote_socket_server_init();
+void * remote_socket_server_init();
 
 #endif /*__remote_socket_h_*/
 

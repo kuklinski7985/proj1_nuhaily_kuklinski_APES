@@ -1,7 +1,10 @@
 SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c ipc_messq.c remote_socket_server.c #myusrled.c
+SOURCES_SOCK = socketclient.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c ipc_messq.c #myusrled.c 
 OBJS = $(SOURCES:.c=.o)
+OBJS_SOCK =$(SOURCES_SOCK:.c=.o)
 IMP = $(SOURCES:.c=.i)
-INCLUDES =
+IMP_SOCK = $(SOURCES_SOCK:.c=.i)
+INCLUDES = main.h
 CC = arm-linux-gnueabihf-gcc
 DEBUG = -pthread -lrt #-g -Wall -Werror -O0
 CPPFLAGS =
@@ -29,6 +32,11 @@ compile-all: $(OBJS)
 build: $(OBJS)
 	$(CC) $(DEBUG) $(OBJS) $(LDFLAGS) -o project1.elf -lrt
 	size project1.elf $(OBJS)
+
+.PHONY: buildc
+buildc: $(OBJS_SOCK)
+	$(CC) $(DEBUG) $(OBJS_SOCK) $(LDFLAGS) $(INCLUDES) -o client.elf -lrt
+	size client.elf $(OBJS_SOCK)
 
 
 .PHONY: clean

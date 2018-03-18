@@ -9,6 +9,7 @@
 #include "ipc_messq.h"
 
 extern int bizzounce;
+int socket_read_flag;
 
 int tempsensor;          //used for return value for open(), file indicator
 
@@ -18,7 +19,7 @@ char writeinfo[2] = {0};
 char * tempsense_path = "/dev/i2c-2";
 temp_unit_t temp_unit_sel;
 
-float temp_previous;
+char * temp_previous;
 
 void *temp_ops()
 {
@@ -70,6 +71,7 @@ void handler_timer(union sigval arg)
   {
     case UNITS_C:
       sprintf(ipc_msg.payload, "%f degC", display_c(readbuf));
+
       break;
     case UNITS_F:
       sprintf(ipc_msg.payload, "%f degF", display_f(readbuf));
@@ -82,7 +84,24 @@ void handler_timer(union sigval arg)
       sprintf(ipc_msg.payload, "err");
       break;
   }
-  
+  while(socket_read_flag = 0)
+  {
+    if(temp_unit_sel == UNITS_C)
+    {
+      sprintf(temp_previous, "%f", display_c(readbuf));
+    }
+    if(temp_unit_sel == UNITS_F)
+    {
+      sprintf(temp_previous, "%f", display_f(readbuf));
+    }
+    if(temp_unit_sel == UNITS_K)
+    {
+      sprintf(temp_previous, "%f", display_k(readbuf));
+    }
+    socket_read_flag = 0;
+  }
+
+
   build_ipc_msg(ipc_msg, msg_str);
  // decipher_ipc_msg(msg_str, &temp);
   mq_send(ipc_queue, msg_str, strlen(msg_str), 0);

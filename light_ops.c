@@ -23,6 +23,7 @@ int bizzounce;
 int lightsensor;          //used for return value for open(), file indicator
 
 float light_previous;     // previously-measured light value
+char * light_global;
 int light_addr = 0x39;       //slave address for the temp sensor
 char light_readbuf[2];    //array for reading and sending data to sensor
 char light_wrbuf[2] = {0};
@@ -123,6 +124,8 @@ void light_timer_handler(union sigval arg)
     mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
   }
   light_previous = light_current;
+  
+  //sprintf(light_global, "%f", light_previous);
 //  printf("IPC queue status from light thread: %s\n", strerror(errno));
 }
 

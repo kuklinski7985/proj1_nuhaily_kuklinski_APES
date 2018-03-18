@@ -24,6 +24,9 @@ mqd_t temp_ipc_queue;      //queue associated with temp sensor
 
 struct mq_attr ipc_attr;          //attributes struct for ipc queue
 
+extern float light_previous;  //global for use in socket, light values
+extern char * temp_previous;  //global for use in socket, temp values
+
 int main()
 {
   char ipc_queue_buff[128];
@@ -39,7 +42,7 @@ int main()
   //char* test_entry = "7\n";
   char buf1[255];
 
- // remote_socket_server_init();
+  //remote_socket_server_init();
 
 
   input1 = (input_struct*)malloc(sizeof(input_struct));
@@ -67,11 +70,12 @@ int main()
     return -1;
   }
 
- /* checking = pthread_create(&socket_thread, &attr, remote_socket_server_init,(void*)input1);
+ checking = pthread_create(&socket_thread, &attr, remote_socket_server_init,(void*)input1);
+  if(checking)
   {
     fprintf(stderr, "Error creating socket thread");
     return -1;
-  }*/
+  }
 
 
   //printf("Bizzounce before entering while loop: %d\n", bizzounce);
