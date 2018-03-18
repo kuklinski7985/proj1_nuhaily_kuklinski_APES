@@ -139,6 +139,10 @@ float display_c(char * buff)
   int temp_final;
   float celsius;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
+  if(detect_twos(temp_final) == 1)
+  {
+    temp_final = -1*convert_twos( (uint16_t)temp_final );
+  }
   celsius = temp_final * 0.0625;
   //printf("degree-C: %04f\n",celsius);
   return celsius;
@@ -149,6 +153,10 @@ float display_f(char * buff)
   int temp_final;
   float farh;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
+  if(detect_twos(temp_final) == 1)
+  {
+    temp_final = -1*convert_twos( (uint16_t)temp_final );
+  }
   farh = (1.8*(temp_final * 0.0625) +32);
   //printf("degree-F: %04f\n",farh);
   return farh;
@@ -159,7 +167,23 @@ float display_k(char * buff)
   int temp_final;
   float kelvin;
   temp_final = ((buff[0] << 8) | buff[1]) >> 4;
+  if(detect_twos(temp_final) == 1)
+  {
+    temp_final = -1*convert_twos( (uint16_t)temp_final );
+  }
   kelvin = (temp_final * 0.0625) + 273.15;
   //printf("degree-K: %04f\n",kelvin);
   return kelvin;
+}
+
+int detect_twos(int in)
+{
+  return ( (uint16_t)in / 0x8000 );
+}
+
+uint16_t convert_twos(uint16_t in)
+{
+  in = ~in;
+  in++;
+  return in; 
 }

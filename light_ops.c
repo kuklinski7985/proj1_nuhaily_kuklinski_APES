@@ -154,8 +154,8 @@ void light_counter_init(unsigned long long int firedelay)
   timer_actions.sigev_notify_function = light_timer_handler;
   timer_actions.sigev_notify_attributes = NULL;
 
-  timer_interval.it_value.tv_sec = firedelay / 10000000000;
-  timer_interval.it_value.tv_nsec = firedelay % 10000000000;
+  timer_interval.it_value.tv_sec = 1; //firedelay / 10000000000;
+  timer_interval.it_value.tv_nsec = 0; //firedelay % 10000000000;
   timer_interval.it_interval.tv_sec = timer_interval.it_value.tv_sec;//0;
   timer_interval.it_interval.tv_nsec = timer_interval.it_value.tv_nsec;//0;
 
