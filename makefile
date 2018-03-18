@@ -1,5 +1,5 @@
-SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c ipc_messq.c remote_socket_server.c #myusrled.c
-SOURCES_SOCK = socketclient.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c ipc_messq.c #myusrled.c 
+SOURCES = main.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c ipc_messq.c remote_socket_server.c myusrled.c
+SOURCES_SOCK = socketclient.c i2c_wrapper.c tempsense.c temp_ops.c light_ops.c lightsense.c logger/logger.c logger/sync_fileio.c ipc_messq.c myusrled.c 
 OBJS = $(SOURCES:.c=.o)
 OBJS_SOCK =$(SOURCES_SOCK:.c=.o)
 IMP = $(SOURCES:.c=.i)

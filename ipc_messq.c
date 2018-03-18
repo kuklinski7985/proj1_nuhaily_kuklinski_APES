@@ -330,6 +330,7 @@ void manage_ipc_msg(ipcmessage_t msg, char* log_str)
         sprintf(tmp, "%s%s%s%s.\n", msg.timestamp, loglevel, "Temp sensor reads: ", msg.payload);
       }
       break;
+
     case(INFO):
       strcpy(loglevel, "INFO: "); 
       switch(msg.source)
@@ -353,14 +354,40 @@ void manage_ipc_msg(ipcmessage_t msg, char* log_str)
           strcpy(sourceid, "err (sourceid) ");
           break;
       }
-
+      usr_led_toggle(1, 0);
       snprintf(tmp, DEFAULT_BUF_SIZE, "%s%s%s%s\n", msg.timestamp, loglevel, sourceid, msg.payload);
       break;
+
+      case(MSG_ERROR):
+        strcpy(loglevel, "ERROR: ");
+        switch(msg.source)
+        {
+          case(IPC_LIGHT):
+            strcpy(sourceid, "Light sensor message: ");
+            break;
+          case(IPC_TEMP):
+            strcpy(sourceid, "Temp sensor message: ");
+            break;
+          case(IPC_LOG):
+            strcpy(sourceid, "Logger message: ");
+            break;
+          case(IPC_MAIN):
+            strcpy(sourceid, "Main message: ");
+            break;
+          case(IPC_HB):
+            strcpy(sourceid, "Heartbeat thread: ");
+            break;
+          default:
+            strcpy(sourceid, "err (sourceid) ");
+            break;
+        }
+        usr_led_toggle(1, 1);
+        snprintf(tmp, DEFAULT_BUF_SIZE, "%s%s%s%s\n", msg.timestamp, loglevel, sourceid, msg.payload);
+        break;
 
     default:
       break;
   }
-  
   strcpy(log_str, tmp);
   if(msg.type != IPC_USER)
   {

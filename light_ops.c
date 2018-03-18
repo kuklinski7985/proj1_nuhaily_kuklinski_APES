@@ -6,7 +6,6 @@
 **/
 
 #include "light_ops.h"
-#include "ipc_messq.h"
 
 int bizzounce;
 int lightsensor;          //used for return value for open(), file indicator
@@ -52,17 +51,31 @@ void *light_ops()
   if(light_power_test() == 2) 
   {
     light_r_id_reg(lightsensor, sensorid);
+    // Send light sensor power-on state to logfile through main IPC queue
+    strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+    ipc_msg.type = INFO;
+    ipc_msg.source = IPC_LIGHT;
+    ipc_msg.destination = IPC_LOG;
+    ipc_msg.src_pid = getpid(); // pid_t
+    sprintf(ipc_msg.payload, "%s%x%s", "Connecting to light sensor: ID=0x", sensorid[0], "\0");
+    build_ipc_msg(ipc_msg, msg_str);
+      printf("light str:\n%s\n", msg_str);
+    mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
   }
-  // Send light sensor power-on state to logfile through main IPC queue
-  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
-  ipc_msg.type = INFO;
-  ipc_msg.source = IPC_LIGHT;
-  ipc_msg.destination = IPC_LOG;
-  ipc_msg.src_pid = getpid(); // pid_t
-  sprintf(ipc_msg.payload, "%s%x%s", "Connecting to light sensor: ID=0x", sensorid[0], "\0");
-  build_ipc_msg(ipc_msg, msg_str);
-  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
-  
+  else
+  {
+    light_r_id_reg(lightsensor, sensorid);
+    // Send light sensor power-on state to logfile through main IPC queue
+    strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+    ipc_msg.type = MSG_ERROR;
+    ipc_msg.source = IPC_LIGHT;
+    ipc_msg.destination = IPC_LOG;
+    ipc_msg.src_pid = getpid(); // pid_t
+    sprintf(ipc_msg.payload, "%s%s", "Light sensor failed to connect.", "\0");
+    build_ipc_msg(ipc_msg, msg_str);
+    mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+  }
+
   // Initialize light counter
   unsigned long long int delay_time = 500000000;  //in nanoseconds
   light_counter_init(delay_time);

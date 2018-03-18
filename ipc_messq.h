@@ -25,6 +25,7 @@
 #include <errno.h>
 #include "logger/logger.h"
 #include "temp_ops.h"
+#include "myusrled.h"
 
 #ifndef ipc_messq_h_
 #define ipc_messq_h_
@@ -51,7 +52,7 @@ extern mqd_t ipc_queue;
 
 /*types of messages that are possible*/
 typedef enum{
-  QUERY, DATA, INFO, TERMINATE, HEARTBEAT
+  QUERY, DATA, INFO, TERMINATE, MSG_ERROR, HEARTBEAT
 } message_t;
 
 /*locations messages can be sent to and received from*/

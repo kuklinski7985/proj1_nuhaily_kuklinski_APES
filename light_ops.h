@@ -21,9 +21,9 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <math.h>
-//#include "i2c_wrapper.h"
 #include "lightsense.h"
 #include "ipc_messq.h"
+#include "myusrled.h"
 
 #define DEFAULT_BUF_SIZE    256
 
