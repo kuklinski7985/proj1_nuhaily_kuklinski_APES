@@ -73,6 +73,15 @@ void *temp_ops()
       temp_hb_err = 0;
   }
 
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_TEMP;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Temp sensor ops thread exiting.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+
   return 0;
 }
 

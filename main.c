@@ -145,6 +145,15 @@ int main(int argc, char* argv[])
     mq_getattr(ipc_queue, &ipc_attr);
   }
 
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_TEMP;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Main thread exiting.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+
   mq_close(ipc_queue);
   mq_close(temp_ipc_queue);
   mq_close(light_ipc_queue);
@@ -233,6 +242,16 @@ void* heartbeat()
       log_hb_err = 1;
     }
   }
+
+  strcpy(ipc_msg.timestamp, getCurrentTimeStr());
+  ipc_msg.type = INFO;
+  ipc_msg.source = IPC_TEMP;
+  ipc_msg.destination = IPC_LOG;
+  ipc_msg.src_pid = getpid();
+  strcpy(ipc_msg.payload, "Heartbeat thread exiting.\n");
+  build_ipc_msg(ipc_msg, msg_str);
+  mq_send(ipc_queue, msg_str, strlen(msg_str), 0);
+
 }
 
 void hb_warn(union sigval arg)
